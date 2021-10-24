@@ -1,0 +1,651 @@
+#%RAML 1.0 Library
+types:
+  Customer:
+      type: object
+      properties:
+        firstName:
+          type: string
+          required: false
+          example: Omkar
+        lastName:
+          type: string
+          required: true
+          example: Kulkarni
+        email:
+          type: string
+          required: false
+          example: test@acme.com
+        address:
+          type: UpsAddress
+          required: true
+        shippingInstruction:
+          type: string
+          required: false
+  UpsAddress:
+    type: object
+    properties:
+      line1:
+        type: string
+        example: 123 test st.
+        required: false
+      line2:
+        type: string
+        example: ste 200
+        required: false
+      line3:
+        type: string
+        example: line3
+        required: false
+      city:
+        type: string
+        required: true
+      state:
+        type: string
+        example: OH
+        required: true
+      country:
+        type: string
+        example: US
+        required: true
+      zip:
+        type: string
+        example: 41104-0443
+        required: true
+  ParcelRateRequest:
+    type: object
+    properties:
+      shipment:
+        type: object
+        properties:
+          shipper:
+            type: object
+            required: false
+            properties:
+              name:
+                type: string
+                example: stewart and stevenson
+                required: false
+              shipperNumber:
+                type: string
+                example: 12345E
+                required: false
+              address:
+                type: UpsAddress
+          shipTo:
+            type: object
+            required: true
+            properties:
+              name:
+                type: string
+                required: false
+                example: Reliable Transmissions
+              address:
+                type: UpsAddress
+          shipFrom:
+            type: object
+            required: true
+            properties:
+              name:
+                type: string
+                required: false
+                example: Online Warehouse S&amp;S
+              address:
+                type: UpsAddress
+          alternateDeliveryAddress:
+            type: object
+            required: false
+            properties:
+              name:
+                type: string
+                required: false
+                example: Reliable Transmissions 2
+              address:
+                type: UpsAddress
+          service:
+            enum: ["Next Day Air","2nd Day Air","Ground","3 Day Select","Next Day Air Saver","UPS Next Day Air Early","2nd Day Air A.M."]
+            required: true
+            example: Next Day Air
+          shipmentWeight:
+            type: number
+            example: 80
+          shipmentWeightUom:
+            enum: ["LBS","KGS"]
+            example: LBS
+          packageWeight:
+            type: number
+            example: 85
+          packageWeightUom:
+            enum: ["LBS","KGS"]
+          packageServiceOptions:
+            type: object
+            required: false
+            properties:
+              hazMat:
+                type: object
+                required: false
+                properties:
+                  packageIdentifier:
+                    type: string
+                    required: false
+                  qvalue:
+                    type: string
+                    required: false
+                  overPackedIndicator:
+                    type: boolean
+                    required: false
+                  allPackedInOneIndicator:
+                    type: boolean
+                    required: false
+                  hazmatChemicalRecord:
+                    type: object
+                    required: false
+                    properties:
+                      id:
+                        type: string
+                        required: false
+                      classDivisionNumber:
+                        type: string
+                        required: false
+                      idNumber:
+                        type: string
+                        required: false
+          taxInfoIndicator:
+            type: boolean
+            required: false
+            default: true
+                
+  BookOrdersReq:
+    type: object
+    properties:
+      paymentInformation:
+        type: object
+        required: false
+        properties:
+          paymentType:
+            type: string
+            example: CREDIT_CARD
+          cardBrand:
+            type: string
+            example: "Visa"
+            required: false
+          cardCode:
+            type: string
+            example: UNKNWON
+          cardHolderName:
+            type: string
+            example: Test User
+          cardNumber:
+            type: string
+            example: "4444222233335555"
+          cardExpiration:
+            type: string
+            example: "12/20"
+          paymentAmount:
+            type: number
+            example: 12.23
+          approvalCode:
+            type: string
+            example: transaction_id
+          approvalDate:
+            type: string
+            example: signed_date_time
+      headerId:
+        type: string
+        example: "4792449"
+        required: true
+        minLength: 1
+      poNumber:
+        type: string | nil
+        example: "testPO"
+        required: false
+      sfOrder:
+        type: string
+        example:
+          "O-0000001"
+        minLength: 1
+  ProductDetails:
+    type: object
+    properties:
+      productId:
+        type: string
+        example:
+          "34300"
+      orgId:
+        type: string
+        example:
+          "23"
+      uomCode:
+        type: string
+        example:
+          "Ea"
+      segment1:
+        type: string
+        required: true
+        example: ATD
+      segment2:
+        type: string
+        required: true
+        example: "8883"
+      segment3:
+        type: string
+        required: true
+        example: DST
+      segment4:
+        type: string
+        required: true
+        example: ATDSE
+      quantity:
+        type: number
+        example:
+          20
+        required: false
+  PriceInvReq:
+    type: object
+    properties:
+      customerId:
+        type: string
+        example:
+          "22330"
+      productDetails:
+        type: array
+        items: ProductDetails
+      inventoryLocation:
+        type: string | nil
+        required: false
+        example:
+          "Web Warehouse"
+  PriceInv:
+    type: object
+    properties:
+      productId:
+        type: string
+        example:
+          "34300"
+      listPrice:
+        type: number
+        example:
+          10.49
+      webPrice:
+        type: number
+        example:
+          9.99
+      adjustedPrice:
+        type: number
+        example:
+          6.99
+      onhandQuantity:
+        type: number
+        example:
+          41
+      reservableOnhandQty:
+        type: number
+        example:
+          41
+      reservedQuantity:
+        type: number
+        example:
+          0
+      suggestedQuantity:
+        type: number
+        example:
+          0
+  OrderHeader:
+    type: object
+    properties:
+      poNumber:
+        type: string
+        example:
+          WARRANTY
+        required: true
+      invoiceToOrgId:
+        type: string
+        example:
+          "469438"
+        required: false
+      shipFromOrgId:
+        type: string
+        example:
+          "384"
+        required: true
+      shipToOrgId:
+        type: string
+        example:
+          "469439"
+        required: true
+      soldToOrgId:
+        type: string
+        example:
+          "1151084"
+        required: true
+      currencyCode:
+        type: string
+        default: USD
+        example:
+          USD
+        description: for future use but defaulted to USD
+        required: false
+      salesrepId:
+        type: string
+        required: false
+        description: salesrep id in Oracle as input
+        example:
+          "100008157"
+      pricelistId:
+        type: string
+        required: false
+        description: This is only to give flexibility to API.
+        example: "4035721"
+      shippingMethodCode:
+        type: string
+        required: false
+        example: "000001_PICK UP_P_CUSTOMER P"
+        description: Not required but added for flexibility.
+  OrderLine:
+    type: object
+    properties:
+      lineId:
+        type: number
+        example:
+          13221343
+        description: Send backend line item id. Only send this to update an order.
+        required: false
+      lineNumber:
+        type: number
+        example:
+          1.0
+        description: line number to identify line. Can be any numerical value. Can be decimal or integer.
+        required: true
+      itemId:
+        type: string
+        example:
+          "34300-384"
+        description: ccrz__ProductId__c on Product object.
+        required: true
+      itemName:
+        type: string
+        example: "Drum of oil"
+        required: true
+        description: This field will be stored in Oracle as Web product name. This is reqd to create invoices.
+      orderedQty:
+        type: number
+        example: 10
+        required: true
+        description: send negative value to denote returns.
+      unitPrice:
+        type: number
+        example: 10.99
+        required: true
+      unitSellingPrice:
+        type: number
+        example: 12.99
+        required: true
+        description: Add any shipping price calculated per item. If using ground freight API to get ratings of a product, divide totalShipmentCharge by ordered quantity and add it in the original unit price. E.g. If original unit price is 10, ordered qty is 10 and total shipping cost is 100 then unitSellingPrice should be (10+(100/10)) = 20 ==> (unit_price + (shipping_cost/ordered_qty))
+      calculateFlag:
+        type: boolean
+        required: false
+        example:
+          true
+      shippingMethodCode:
+        type: string
+        required: false
+        example: "000001_PICK UP_P_CUSTOMER P"
+        description: Not required but added for flexibility.
+      shippingInstructions:
+        type: string
+        required: false
+        example:
+          "Ship in 12x12x12 box"
+      packingInstructions:
+        type: string
+        required: false
+        example: "Add a return slip inside box"
+      operation:
+        required: false
+        description: Do NOT send this while creating an order. It will be always CREATE. Only use it in PATCH call.
+        enum : [CREATE, UPDATE, DELETE]
+  Order:
+    type: object
+    properties:
+      header:
+        type: OrderHeader
+      lines:
+        type: array
+        items: OrderLine
+  Address:
+    type: object
+    properties:
+      addressLine:
+        type: string
+        required: true
+      city:
+        type: string
+        required: true
+      state:
+        type: string
+        required: true
+      postalCode:
+        type: string
+        required: true
+      countryCode:
+        type: string
+        required: true
+      residentialAddress:
+        type: boolean
+        required: false
+  AddressValidation:
+    type: object
+    properties:
+      businessName:
+        type: string
+        required: false
+      line1:
+        type: string
+        required: true
+      line2:
+        type: string
+        required: false
+      line3:
+        type: string
+        required: false
+      city:
+        type: string
+        required: true
+      stateCode:
+        type: string
+        required: true
+      countryCode:
+        type: string
+        required: true
+      zip:
+        type: string
+        required: true
+      maximumCandidateSize:
+        type: number
+        required: false
+        default: 3
+  FreigtRate:
+    type: object
+    properties:
+      shipFrom:
+        type: object
+        properties:
+          name:
+            type: string
+            required: false
+          address:
+            type: Address
+            required: true
+          attentionName:
+            type: string
+            required: false
+      shipTo:
+        type: object
+        properties:
+          name:
+            type: string
+            required: false
+          address:
+            type: Address
+            required: true
+          attentionName:
+            type: string
+            required: false
+      paymentInformation:
+        type: object
+        properties:
+          payer:
+            type: object
+            required: true
+            properties:
+              name:
+                type: string
+                required: false
+              address:
+                type: Address
+                required: true
+              attentionName:
+                type: string
+                required: false
+              shipperNumber:
+                type: string
+                required: false
+          shipmentBillingOption:
+            type: object
+            properties:
+              code:
+                type: string
+                required: false
+                default: "10"
+              description:
+                type: string
+                required: false
+                default: "PREPAID"
+      service:
+        type: object
+        required: false
+        properties:
+          code:
+            type: string
+            required: false
+            default: "308"
+          description:
+            type: string
+            required: false
+            default: "UPS Freight LTL"
+      handlingUnitOne:
+        type: object
+        required: true
+        properties:
+          quantity:
+            type: string
+            required: true
+          unitType:
+            type: object
+            required: false
+            properties:
+              code:
+                type: string
+                default: "LOO"
+              description:
+                type: string
+                default: "Loose"
+      commodities:
+        type: array
+        items: commodity
+        maxItems: 99
+      pickupRequest:
+        type: object
+        required: false
+        properties:
+          pickupDate:
+            type: string
+            description: "Date only with format YYYYMMDD"
+            required: true
+          additionalComments:
+            type: string
+            required: true
+      timeInTransit:
+        type: boolean
+        required: false
+        default: false
+  commodity:
+        type: object
+        properties:
+          commidityId:
+            type: string
+            required: false
+          description:
+            type: string
+            required: true
+          weight:
+            type: object
+            properties:
+              value:
+                type: string
+                required: true
+              unitOfMeasurement:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    required: true
+                  description:
+                    type: string
+                    required: false
+          dimensions:
+            type: object
+            required: false
+            properties:
+              length:
+                type: string
+                required: false
+              width:
+                type: string
+                required: false
+              height:
+                type: string
+                required: false
+              unitOfMeasurement:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    required: true
+                  description:
+                    type: string
+                    required: false
+          numberOfPieces:
+            type: string
+            required: true
+          packagingType:
+            type: object
+            required: false
+            properties:
+              code:
+                type: string
+                default: "PLT"
+              description:
+                type: string
+                default: "Pallet"
+          dangerousGoods:
+            type: boolean
+            required: true
+          commodityValue:
+            type: object
+            required: true
+            properties:
+              currencyCode:
+                type: string
+                required: true
+                example:
+                  "USD"
+              monetoryValue:
+                type:
+                  string
+                required: true
+                example:
+                  "200.33"
+          freightClass:
+            type: string
+            required: false
+            default: "85"

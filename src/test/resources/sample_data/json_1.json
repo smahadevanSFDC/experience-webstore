@@ -1,0 +1,83 @@
+{
+    "timeInTransit": true,
+    "shipTo": {
+        "tarrifPoint": "",
+        "name": "Associated Supply Co",
+        "attentionName": "",
+        "address": {
+            "state": "NM",
+            "residentialAddress": false,
+            "postalCode": "88101-7782",
+            "countryCode": "US",
+            "city": "CLOVIS",
+            "addressLine": "108 S MAPLE ST"
+        }
+    },
+    "shipFrom": {
+        "tarrifPoint": "",
+        "name": "Online Warehouse",
+        "attentionName": "",
+        "address": {
+            "state": "TX",
+            "residentialAddress": false,
+            "postalCode": "75212",
+            "countryCode": "US",
+            "city": "Dallas",
+            "addressLine": "1631 Chalk Rill Rd"
+        }
+    },
+    "service": {
+        "description": "UPS Freight LTL",
+        "code": "308"
+    },
+    "paymentInformation": {
+        "shipmentBillingOption": {
+            "description": "PREPAID",
+            "code": "10"
+        },
+        "payer": {
+            "shipperNumber": "",
+            "name": "Online Warehouse",
+            "attentionName": "",
+            "address": {
+                "state": "TX",
+                "residentialAddress": false,
+                "postalCode": "75212",
+                "countryCode": "US",
+                "city": "Dallas",
+                "addressLine": "1631 Chalk Rill Rd"
+            }
+        }
+    },
+    "handlingUnitOne": {
+        "unitType": {
+            "description": "Loose",
+            "code": "LOO"
+        },
+        "quantity": "1"
+    },
+    "commodities": [
+        {
+            "weight": {
+                "value": "798",
+                "unitOfMeasurement": {
+                    "description": "pounds",
+                    "code": "Lb"
+                }
+            },
+            "packagingType": {
+                "description": "Pallet",
+                "code": "PLT"
+            },
+            "numberOfPieces": "1",
+            "freightClass": "85",
+            "description": "B400RRM RETRAN",
+            "dangerousGoods": false,
+            "commodityValue": {
+                "monetoryValue": "7159.95",
+                "currencyCode": "USD"
+            },
+            "commodityId": "29549630"
+        }
+    ]
+}

@@ -1,0 +1,900 @@
+#%RAML 1.0
+title: Web Storefront APIs
+description: This is a Process Layer API for getting Products(Items) List Price, Adjusted Price for a given customer. This API calls EBS-System Layer APIs to fetch price and inventory details for a product.
+version: 1.3
+protocols: HTTPS
+baseUri: https://anypoint.mulesoft.com/mocking/api/v1/links/8b08f05f-d581-4e68-b6ca-36fbff835377/ # baseUri: https://anypoint.mulesoft.com/mocking/api/v1/links/049eef31-4648-4c5f-9624-e484b0b5e9c7/ # baseUri: https://dev.api.dieseldash.com/api/
+uses:
+  types: datatypes.raml
+securitySchemes:
+  basic:
+    type: Basic Authentication
+/products:
+  /search:
+    securedBy:
+      - basic
+    post:
+      body:
+        application/json:
+          type: types.PriceInvReq
+          example:
+            {
+                "customerId": "1241493",
+                "productDetails": [
+                  {
+                    "productId": "3538506",
+                    "orgId": "327",
+                    "uomCode": "Ea",
+                    "quantity": 1,
+                    "segment1":"ATD",
+                    "segment2":"8883",
+                    "segment3":"DST",
+                    "segment4":"ATDSE"
+                  }
+                ]
+            }
+      responses:
+        200:
+          body:
+            application/json:
+              type: object
+              properties:
+                customerId:
+                  type: string
+                  example:
+                    "22330"
+                inventoryLocation:
+                  type: string
+                  example:
+                    "Web Warehouse"
+                priceQtys:
+                  type: array
+                  items: types.PriceInv
+/orders:
+    get:
+      securedBy:
+        - basic
+      queryParameters:
+        customerId:
+          type: string
+          example:
+            '1150008'
+          required: false
+        billToSiteId:
+          type: string
+          example:
+            '140407'
+          required: false
+        shipToSiteId:
+          type: string
+          example: 
+            '164009'
+          required: false
+        poNumber:
+          type: string
+          example:
+            'OK903A22'
+          required: false
+        orderNumber:
+          type: string
+          example:
+            '842124'
+          required: false
+        quoteNumber:
+          type: string
+          example:
+            '1080'
+          required: false
+        headerStatus:
+          type: string
+          example:
+            'BOOKED'
+          required: false
+        itemId:
+          type: string
+          example:
+            '1080'
+          required: false
+        itemNumber:
+          type: string
+          example:
+            '52748'
+          required: false
+        bookedInLastNDays:
+          type: string
+          example:
+            '100'
+          required: false
+        offset:
+          type: string
+          example:
+            '50'
+          required: false
+        limit:
+          type: string
+          example:
+            '50'
+          required: false
+      responses:
+        200:
+          body:
+            application/json:
+    post:
+      securedBy:
+        - basic
+      body:
+        application/json:
+          type: types.Order
+          example:
+            {
+              "header": {
+                  "poNumber": "WARRANTY",
+                  "invoiceToOrgId": "469438",
+                  "shipFromOrgId": "340",
+                  "shipToOrgId": "469439",
+                  "soldToOrgId": "1151084",
+                  "currencyCode": "USD",
+                  "salesrepId": "100008157",
+                  "pricelistId": "4035721",
+                  "shippingMethodCode": "000001_PICK UP_P_CUSTOMER P",
+                  "paymentInformation":{
+                    "paymentType":"CREDIT_CARD",
+                    "cardBrand":"Visa",
+                    "cardCode":"UNKNOWN",
+                    "cardHolderName":"Customer Name",
+                    "cardNumber":"req_payment_token",
+                    "cardExpiration":"01/21",
+                    "approvalCode":"transaction_id",
+                    "approvalDate":"signed_date_time"
+                  }
+              },
+              "lines": [
+                  {
+                      "lineNumber": 1,
+                      "itemId": "34300-384",
+                      "itemName": "Drum of oil",
+                      "orderedQty": 10,
+                      "unitPrice": 99.99,
+                      "shipFromOrgId":"340",
+                      "shipToOrgId":"469439",
+                      "invoiceToOrgId":"469438",
+                      "unitSellingPrice": 89.99,
+                      "calculateFlag": true
+                  }
+              ]
+          }
+      responses:
+        201:
+          body:
+            application/json:
+              example:
+                {
+                  "status": "S",
+                  "messages": [
+                    null,
+                    "Debug File: /usr/tmp/l5113387.dbg"
+                  ],
+                  "header": {
+                    "id": "4788014",
+                    "orderNumber": "851168",
+                    "booked": false,
+                    "cancelled": false,
+                    "creationDate": "2019-10-09T11:29:05.000-05:00",
+                    "fobPointCode": "SHIP POINT",
+                    "freightCarrierCode": "PICK UP",
+                    "invoiceToOrgId": "153278",
+                    "isOrderOpen": true,
+                    "shippingMethodCode": "PICK UP",
+                    "shipFromOrgId": "219",
+                    "shipToOrgId": "153279",
+                    "soldToOrgId": "1154046",
+                    "flowStatus": "ENTERED",
+                    "taxExempt": "Standard",
+                    "taxExemptNumber": null,
+                    "taxExemptReason": null,
+                    "taxPoint": null
+                  },
+                  "lines": [
+                    {
+                      "id": "17778543",
+                      "lineNumber": "1",
+                      "fobPointCode": "SHIP POINT",
+                      "freightCarrierCode": "PICK UP",
+                      "itemId": "3482440",
+                      "invoiceToOrgId": "153278",
+                      "isOpen": true,
+                      "pricingQty": "1",
+                      "pricingQtyUom": "Ea",
+                      "shipmentNumber": "1",
+                      "shipmentMethodCode": "PICK UP",
+                      "unitListPrice": "467.11",
+                      "unitSellingPrice": "363.8",
+                      "flowStatus": "ENTERED",
+                      "taxCode": null,
+                      "taxDate": "2019-10-09T11:29:05.000-05:00",
+                      "taxExempt": "S",
+                      "taxExemptNumber": null,
+                      "taxExemptReasonCode": null,
+                      "taxPointCode": null,
+                      "taxRate": null,
+                      "taxValue": null,
+                      "deliverToOrgId": null,
+                      "shippedQuantity": null,
+                      "shippingQuantity": null,
+                      "shipFromOrgId": "219",
+                      "shipToOrgId": "153279",
+                      "soldToOrgId": "1154046",
+                      "shippableFlag": true
+                    }
+                  ]
+                }
+    /book:
+        securedBy:
+        - basic
+        post:
+          body:
+            application/json:
+              type: array
+              items: types.BookOrdersReq
+              example:
+                [
+                  {
+                      "headerId": "4792449",
+                      "poNumber": "testPO1",
+                      "sfOrder": "O-0000001",
+                      "returnOrder":true,
+                      "paymentInformation":{
+                        "paymentType":"CREDIT_CARD",
+                        "cardCode":"UNKNOWN",
+                        "cardHolderName":"Customer Name",
+                        "cardNumber":"req_payment_token",
+                        "cardExpiration":"01/21",
+                        "paymentAmount":32.23,
+                        "approvalCode":"transaction_id",
+                        "approvalDate":"signed_date_time",
+                        "cvv":"",
+                        "avs":""
+                      }
+                  },
+                  {
+                      "headerId": "4792450",
+                      "poNumber": "testPO2",
+                      "sfOrder": "O-0000002",
+                      "returnOrder":false
+                  }
+              ]
+          responses:
+            201:
+              body:
+                application/json:
+                  example:
+                    {
+                      "success": true
+                    }
+    /cancel:
+        securedBy:
+        - basic
+        post:
+          body:
+            application/json:
+              type: array
+              items: string
+              example: ["433554","555444"] 
+          responses:
+            201:
+              body:
+                application/json:
+                  example:
+                    {
+                      "success": true
+                    }
+    /returns:
+      securedBy:
+      - basic
+      post:
+        body:
+          application/json:
+            example:
+              {
+              "header": {
+                  "invoiceToOrgId": "469438",
+                  "shipFromOrgId": "340",
+                  "shipToOrgId": "469439",
+                  "soldToOrgId": "1151084",
+                  "currencyCode": "USD",
+                  "salesrepId": "100008157",
+                  "pricelistId": "4035721",
+                  "shippingMethodCode": "000001_PICK UP_P_CUSTOMER P"
+              },
+              "lines": [
+                  {
+                      "lineNumber": 1,
+                      "itemId": "34300-384",
+                      "itemName": "Drum of oil",
+                      "orderedQty": 10,
+                      "unitPrice": 99.99,
+                      "shipFromOrgId":"340",
+                      "shipToOrgId":"469439",
+                      "invoiceToOrgId":"469438",
+                      "unitSellingPrice": 89.99,
+                      "calculateFlag": true
+                  }
+              ]
+          }
+    /{headerId}:
+      securedBy:
+        - basic
+      get:
+        responses:
+          200:
+            body:
+              application/json:
+                example:
+                 {
+                  "header": {
+                    "orderId": "4788014",
+                    "orderNumber": "851168",
+                    "cancelled": false,
+                    "booked": false,
+                    "isOpen": true,
+                    "poNumber": "Omkar PO Testing New",
+                    "currencyCode": "USD",
+                    "invoiceToOrgId": "153278",
+                    "soldToOrgId": "1154046",
+                    "pricelistId": "3664624",
+                    "shipFromOrgId": "219",
+                    "shippingInstructions": null,
+                    "packingInstructions": null,
+                    "shippingMethodCode": "PICK UP",
+                    "salesrepId": "100004128",
+                    "changeReason": null,
+                    "flowStatus": "ENTERED",
+                    "taxExempt": "Standard",
+                    "taxExemptNumber": null,
+                    "taxExemptReason": null,
+                    "taxPoint": null
+                  },
+                  "lines": [
+                    {
+                      "id": "17778543",
+                      "lineNumber": "1",
+                      "itemId": "3482440",
+                      "unitPrice": "467.11",
+                      "isOpen": true,
+                      "unitSellingPrice": "467.11",
+                      "orderedQty": "1",
+                      "cancelledQty": "0",
+                      "cancelled": false,
+                      "booked": false,
+                      "pricelistId": "3664624",
+                      "shippingInstructions": null,
+                      "packingInstructions": null,
+                      "shippingMethodCode": "PICK UP",
+                      "flowStatus": "ENTERED",
+                      "taxCode": null,
+                      "taxDate": "2019-10-09T11:29:05.000-05:00",
+                      "taxExempt": "S",
+                      "taxExemptNumber": null,
+                      "taxExemptReasonCode": null,
+                      "taxPointCode": null,
+                      "taxRate": null,
+                      "taxValue": "45.54",
+                      "deliverToOrgId": null,
+                      "invoiceToOrgId": "153278",
+                      "shippedQuantity": null,
+                      "shippingQuantity": null,
+                      "shipFromOrgId": "219",
+                      "shipToOrgId": "153279",
+                      "soldToOrgId": "1154046",
+                      "shippableFlag": true
+                    }
+                  ]
+                }
+      post:
+        securedBy:
+          - basic
+        description: This method accepts input to book or cancel order for the given header Id. Send "booked" field as true to book an order, similarly send "cancelled" as true to cancel an order. Rest of the payload if sent, while booking or cancelling an order, will be ignored. Do not send booked or cancelled flag while updating other fields on orders or order lines.
+        body:
+          application/json:
+            examples:
+              BookOrder : {
+                  "header":{
+                    "booked":true,
+                    "cancelled": false
+                  }
+                }
+              CancelOrder: {
+                "header":{
+                  "booked":false,
+                  "cancelled":true
+                }
+              }
+              UpdateOrder: {
+                "header": {
+                    "soldToOrgId": "1154046",
+                    "salesrepId": "100004145",
+                    "pricelistId": "3664624",
+                    "poNumber": "Test from Salesforce",
+                    "customerAccountId": "1154046",
+                    "currencyCode": "USD",
+                    "operation": "UPDATE",
+                    "changeReason": "Changing pricelist id"
+                },
+                "lines": [
+                    {
+                        "unitSellingPrice": 82.05,
+                        "unitPrice": 82.05,
+                        "pricelistId": "3664624",
+                        "orderedQty": 1,
+                        "itemId": "3723342",
+                        "id": "1",
+                        "operation": "UPDATE",
+                        "changeReason": "Changing ordered quantity"
+                    }
+                ]
+            }
+        responses:
+          200:
+            body:
+              application/json:
+/customer:
+  /{custAccountNumber}:
+    post:
+      securedBy:
+        - basic
+      body:
+        application/json:
+          example:
+            {
+                "firstName":"test",
+                "lastName":"user",
+                "companyName":"Acumen Solutions"
+            }
+      responses:
+        201:
+          body:
+            application/json:
+              example:
+                {
+                  "status":"S",
+                  "messages":"",
+                  "partyId":"3642887"
+                }    
+    /addresses:
+      /{contactAddrId}:
+        post:
+          securedBy:
+          - basic
+          body:
+            application/json:
+              example:
+                {
+                   "active": true,
+                   "city": "SANTA CRUZ",
+                   "contact": {
+                      "firstName": "Test",
+                      "lastName": "Red25-Edit",
+                      "contactPartyId":"3321323"
+                   },
+                   "country": "US",
+                   "line1": "354 WASHINGTON ST",
+                   "primary": false,
+                   "shippingInstruction": "Use the doorbell at front door",
+                   "state": "CA",
+                   "zip": "95060-4929"
+                }  
+          responses:
+            201:
+              body:
+                application/json:
+                  example:
+                      {
+                        "status":"S",
+                        "addressId":"321323"
+                      }
+      /emails:
+        /{emailContactAddrId}:
+          post:
+              securedBy:
+              - basic
+              body:
+                application/json:
+                  example:
+                    {
+                      "emailId":"test@test.com",
+                      "primary": true,
+                      "status":"not a required field",
+                      "contactPurpose":"not a required field"
+                    }
+              responses:
+                201:
+                  body:
+                    application/json:
+                      example:
+                        {
+                          "success":"S",
+                          "message": ""
+                        }
+      /phones:
+        /{phoneContactAddrId}:
+          post:
+              securedBy:
+              - basic
+              body:
+                application/json:
+                  example:
+                    {
+                      "number":"5435435453",
+                      "extn":"4433",
+                      "primary": true,
+                      "status":"not a required field",
+                      "contactType":"not a required field",
+                      "contactPurpose":"not a required field"
+                    }
+              responses:
+                201:
+                  body:
+                    application/json:
+                      example:
+                        {
+                          "success":"S",
+                          "message": ""
+                        }
+      post:
+        securedBy:
+          - basic
+        body:
+          application/json:
+            example:
+              {
+                "primary": true,
+                "contact": {
+                  "firstName": "Testing",
+                  "lastName": "Testing"
+                },
+                "address": {
+                  "line1": "5700 Lombardo ctr",
+                  "line2": "ste 201",
+                  "line3": "",
+                  "city": "Seven Hills",
+                  "state": "OH",
+                  "county": "Hillsborough county",
+                  "country": "US",
+                  "zip": "44031",
+                  "shippingInstruction": "Use the doorbell at front door",
+                  "addressType": "shipTo"
+                }
+              }  
+        responses:
+          201:
+            body:
+              application/json:
+                example:
+                    {
+                      "status":"S",
+                      "customerAccountId":"1274562",
+                      "accountNumber":"97786",
+                      "partyId":"3642887",
+                      "shipToPartnerId":"12345",
+                      "billToPartnerId":""
+                    }
+  post:
+    securedBy:
+      - basic
+    body:
+      application/json:
+        example:
+          {
+          "firstName":"Test",
+          "lastName":"User",
+          "companyName":"Acumen Solutions",
+          "email":"testuser@acumensolutions.com",
+          "phone":"1233211234",
+          "address":{
+            "line1":"5700 Lombardo ctr",
+            "line2": "ste 201",
+            "line3":"",
+            "city":"Seven Hills",
+            "state":"OH",
+            "county":"Hillsborough county",
+            "country":"US",
+            "zip":"44031",
+            "shippingInstruction":"Use the doorbell at front door"
+          },
+          "shipToSameAsBillTo": true
+        }
+    responses:
+      201:
+        body:
+          application/json:
+            example:
+              {
+                "status":"S",
+                "customerAccountId":"1274562",
+                "accountNumber":"97786",
+                "partyId":"3642887",
+                "shipToPartnerId":"12345",
+                "billToPartnerId":"56789",
+                "contactAddrId":"3543545",
+                "phoneContactAddrId":"432434",
+                "emailContactAddrId":"546456"
+              }
+  /addresses:
+    /validate:
+      post:
+        securedBy:
+          - basic
+        body:
+          application/json:
+            type: types.AddressValidation
+            example:
+              {
+                "businessName":"Affinia Manhattan Hotel",
+                "line1":"371 7th Ave",
+                "line2":"",
+                "line3":"",
+                "city":"New York",
+                "stateCode":"NY",
+                "countryCode":"US",
+                "zip":"10001"
+              }
+          
+  /credit/calculate:
+    post:
+      securedBy:
+        - basic
+      body:
+        application/json:
+          example:
+              {
+                customerId: 1149124,
+                partyId: 3220356,
+                siteId: 137928,
+                currencyCode: 'USD'
+              }
+      responses:
+        201:
+          body:
+            application/json:
+              example:
+                {
+                  totalExposure: 8132.83,
+                  orderHoldAmount: 0,
+                  orderAmount: 193.42,
+                  arAmount: 7939.41
+                }
+/shipments:
+  /rates:
+    /parcel:
+      post:
+        securedBy:
+          - basic
+        body:
+          application/json:
+            type: types.ParcelRateRequest
+            example:
+              {
+                "shipment": {
+                    "shipper": {
+                        "address": {
+                            "line1": "1631 Chalk Rill Rd",
+                            "city": "Dallas",
+                            "state": "TX",
+                            "country": "US",
+                            "zip": "75212"
+                        },
+                        "name": "Stewart & Stevenson",
+                        "shipperNumber": "7425E9"
+                    },
+                    "shipFrom": {
+                        "address": {
+                            "line1": "1631 Chalk Rill Rd",
+                            "city": "Dallas",
+                            "state": "TX",
+                            "country": "US",
+                            "zip": "75212"
+                        },
+                        "name": "Stewart & Stevenson"
+                    },
+                    "shipmentWeight": 20,
+                    "service": "Next Day Air",
+                    "packageWeight": 22,
+                    "packageWeightUom": "LBS",
+                    "taxInfoIndicator": true,
+                    "shipmentWeightUom": "LBS",
+                    "shipTo": {
+                        "address": {
+                            "line1": "5700 Lombardo center",
+                            "line2": "ste. 201",
+                            "city": "Seven Hills",
+                            "state": "OH",
+                            "country": "US",
+                            "zip": "44031"
+                        },
+                        "name": "Acme"
+                    },
+                    "packageServiceOptions": {
+                        "declaredValue": {
+                            "currencyCode": "USD",
+                            "monetaryValue": "2000"
+                        }
+                    }
+                }
+              }
+        responses:
+          201:
+            body:
+              application/json:
+                example:
+                  {
+  "response": {
+    "responseStatus": {
+      "Code": "1",
+      "Description": "Success"
+    },
+    "Alert": [
+      {
+        "Code": "110971",
+        "Description": "Your invoice may vary from the displayed reference rates"
+      }
+    ]
+  },
+  "ratedShipment": {
+    "service": {
+      "Code": "01",
+      "Description": null
+    },
+    "billingWeight": {
+      "UnitOfMeasurement": {
+        "Code": "LBS",
+        "Description": "Pounds"
+      },
+      "Weight": "22.0"
+    },
+    "transportationCharge": {
+      "CurrencyCode": "USD",
+      "MonetaryValue": "206.51"
+    },
+    "negotiatedRateCharges": {
+      "TotalCharge": {
+        "CurrencyCode": "USD",
+        "MonetaryValue": "204.44"
+      }
+    }
+  }
+}
+    /ground:
+      /freight:
+        post:
+          securedBy:
+            - basic
+          body:
+            application/json:
+              type: types.FreigtRate
+              example:
+                {
+                  "shipFrom": {
+                      "name": "SNS Freight",
+                      "address": {
+                          "addressLine": "1631 CHALK RILL RD",
+                          "city": "DALLAS",
+                          "state": "TX",
+                          "postalCode": "75212",
+                          "countryCode": "US",
+                          "residentialAddress": false
+                      },
+                      "attentionName": "",
+                      "tarrifPoint": ""
+                  },
+                  "shipTo": {
+                      "name": "",
+                      "address": {
+                          "addressLine": "5700 Lombardo Ctr. Ste. 201",
+                          "city": "Seven Hills",
+                          "state": "OH",
+                          "postalCode": "44130",
+                          "countryCode": "US",
+                          "residentialAddress": false
+                      },
+                      "attentionName": "Mr. Omkar",
+                      "tarrifPoint": ""
+                  },
+                  "paymentInformation": {
+                      "payer": {
+                          "name": "SNS",
+                          "address": {
+                              "addressLine": "55 Waugh Dr # 1000",
+                              "city": "Houston",
+                              "state": "TX",
+                              "postalCode": "77007",
+                              "countryCode": "US",
+                              "residentialAddress": false
+                          },
+                          "attentionName": "",
+                          "shipperNumber": "Account Id"
+                      },
+                      "shipmentBillingOption": {
+                          "code": "10",
+                          "description": "PREPAID"
+                      }
+                  },
+                  "service": {
+                      "code": "308",
+                      "description": "UPS Freight LTL"
+                  },
+                  "handlingUnitOne": {
+                      "quantity": "50",
+                      "unitType": {
+                          "code": "LOO",
+                          "description": "Loose"
+                      }
+                  },
+                  "commodities": [
+                      {
+                          "commidityId": "",
+                          "description": "Drum of oil",
+                          "weight": {
+                              "value": "500",
+                              "unitOfMeasurement": {
+                                  "code": "lbs",
+                                  "description": "pounds"
+                              }
+                          },
+                          "dimensions": {
+                              "length": "35",
+                              "width": "24",
+                              "height": "40",
+                              "unitOfMeasurement": {
+                                  "code": "in",
+                                  "description": "inches"
+                              }
+                          },
+                          "numberOfPieces": "50",
+                          "packagingType": {
+                              "code": "PLT",
+                              "description": "Pallet"
+                          },
+                          "dangerousGoods": false,
+                          "commodityValue": {
+                              "currencyCode": "USD",
+                              "monetoryValue": "200.33"
+                          },
+                          "freightClass": "85"
+                      }
+                  ],
+                  "pickupRequest": {
+                      "pickupDate": "20191121",
+                      "additionalComments": "Pickup date is in EST"
+                  },
+                  "shipmentServiceOptions": {
+                      "declaredValue": {
+                          "currencyCode": "USD",
+                          "monetaryValue": "2000"
+                      }
+                  },
+                  "timeInTransit": true
+              }
+          responses:
+            201:
+              body:
+                application/json:
+                  example:
+                    {"FreightRateResponse":{"Response":{"ResponseStatus":{"Code":"1", "Description":"Success"}, "Alert":[{"Code":"9369054", "Description":"User is not registered with UPS Ground Freight."}, {"Code":"9369055", "Description":"User is not eligible for contract rates."}, {"Code":"9369080", "Description":"Time in Transit (for FRS/GFP) information  not available at this time."}]}, "Rate":[{"Type":{"Code":"DSCNT", "Description":"DSCNT"}, "Factor":{"Value":"917.95", "UnitOfMeasurement":{"Code":"USD"}}}, {"Type":{"Code":"DSCNT_RATE", "Description":"DSCNT_RATE"}, "Factor":{"Value":"70.00", "UnitOfMeasurement":{"Code":"%"}}}, {"Type":{"Code":"HAZMAT", "Description":"HAZMAT"}, "Factor":{"Value":"30.00", "UnitOfMeasurement":{"Code":"USD"}}}, {"Type":{"Code":"2", "Description":"2"}, "Factor":{"Value":"94.42", "UnitOfMeasurement":{"Code":"USD"}}}, {"Type":{"Code":"LND_GROSS", "Description":"LND_GROSS"}, "Factor":{"Value":"1311.35", "UnitOfMeasurement":{"Code":"USD"}}}, {"Type":{"Code":"AFTR_DSCNT", "Description":"AFTR_DSCNT"}, "Factor":{"Value":"393.40", "UnitOfMeasurement":{"Code":"USD"}}}], "Commodity":{"Description":"Drum of oil", "Weight":{"Value":"500", "UnitOfMeasurement":{"Code":"lbs"}}, "AdjustedWeight":{"Value":"500", "UnitOfMeasurement":{"Code":"lbs"}}}, "TotalShipmentCharge":{"CurrencyCode":"USD", "MonetaryValue":"517.82"}, "BillableShipmentWeight":{"Value":"500", "UnitOfMeasurement":{"Code":"LBS"}}, "DimensionalWeight":{"Value":"0", "UnitOfMeasurement":{"Code":"LBS"}}, "Service":{"Code":"308"}, "AlternateRatesResponse":{"AlternateRateType":{"Code":"1", "Description":"FRS Rate"}, "Rate":[{"Type":{"Code":"DSCNT", "Description":"DSCNT"}, "Factor":{"Value":"1049.08", "UnitOfMeasurement":{"Code":"USD"}}}, {"Type":{"Code":"DSCNT_RATE", "Description":"DSCNT_RATE"}, "Factor":{"Value":"80.00", "UnitOfMeasurement":{"Code":"%"}}}, {"Type":{"Code":"LND_GROSS", "Description":"LND_GROSS"}, "Factor":{"Value":"1311.35", "UnitOfMeasurement":{"Code":"USD"}}}, {"Type":{"Code":"AFTR_DSCNT", "Description":"AFTR_DSCNT"}, "Factor":{"Value":"262.27", "UnitOfMeasurement":{"Code":"USD"}}}], "BillableShipmentWeight":{"Value":"500", "UnitOfMeasurement":{"Code":"LBS"}}}, "RatingSchedule":{"Code":"02", "Description":"Published Rates"}, "TimeInTransit":{"DaysInTransit":"2"}}}
+      
+      /fedEx/freight:
+        post:
+          securedBy:
+            - basic
+          body:
+              application/xml:
+                type: 
+                example:
+          responses:
+            201:
+              body:
+                 application/xml:
+                    example:
+                                                                                                                                                                                                                                                                               
+                    
+              
+                                                  

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:validation="http://www.mulesoft.org/schema/mule/validation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd">
+	<sub-flow name="validateOrderLineUpdates" doc:id="19db1fb3-c300-4c9b-bde5-552d51388b8a" >
+		<logger level="INFO" doc:name="Logger" doc:id="329733cf-011a-4e99-8489-518a67fe9861" message="Validating incoming request"/>
+		<ee:transform doc:name="Transform Message" doc:id="e453414d-a58e-42ef-8afd-2e5b79ae69ee" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="invalidOperations" ><![CDATA[%dw 2.0
+output application/java
+---
+(payload.lines default []) filter(isEmpty($.operation) or (
+	(not contains(["CREATE","CANCEL","UPDATE","DELETE"],$.operation))
+))]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<validation:is-empty-collection doc:name="invalidOperations" doc:id="9f099bb3-c0ac-414b-b0c1-275e184ec49c" values="#[vars.invalidOperations]" message="Invalid or missing operation"/>
+		<logger level="INFO" doc:name="Logger" doc:id="06da75ea-8142-4f82-8224-5e5a09bd5ed9" message="all line items have operations"/>
+		<ee:transform doc:name="Transform Message" doc:id="7256a714-480c-44d7-bce7-fc9f79752cbb">
+			<ee:message>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="invalidLineIds" ><![CDATA[%dw 2.0
+output application/java
+---
+((payload.lines default []) filter ($.operation != "CREATE" and isEmpty($.lineId)))]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<validation:is-empty-collection doc:name="invalidLineIds" doc:id="22f9c1e6-663a-48c5-b290-2a96ebab2301" values="#[vars.invalidLineIds]" message="Line IDs are required when updating existing lines"/>
+		<logger level="INFO" doc:name="Logger" doc:id="006dc13a-e35f-42b7-965f-0b6a3fb6b70b" message="all line items have line ids"/>
+		<ee:transform doc:name="Transform Message" doc:id="e4d916b8-6dd2-4e29-a4b1-5e2bc774814d" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="invalidCreateLines" ><![CDATA[%dw 2.0
+output application/java
+---
+(payload.lines default[]) filter ($.opeartion == "CREATE" and (
+	isEmpty($.itemId) or
+	isEmpty($.orderedQty) or
+	isEmpty($.itemName) or
+	isEmpty($.unitSellingPrice) or
+	isEmpty($.unitPrice)
+))]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<validation:is-empty-collection doc:name="Is empty collection" doc:id="bfee0add-a2a1-4f00-bcfa-75d2a1b399fe" values="#[vars.invalidCreateLines]" message="Invalid request for lines with operation CREATE. "/>
+		<logger level="INFO" doc:name="Logger" doc:id="dcec3bfd-026f-4788-8695-66215b20c0db" message="all create line items have correct values"/>
+	</sub-flow>
+</mule>

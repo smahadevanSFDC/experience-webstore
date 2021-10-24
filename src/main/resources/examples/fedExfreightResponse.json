@@ -1,0 +1,98 @@
+{
+    "FreightRateResponse": {
+        "Response": {
+            "ResponseStatus": "SUCCESS",
+            "Alert": "Request was successfully processed. ",
+            "TransactionReference": "RateRequest_v28"
+        },
+        "Service": "FEDEX_FREIGHT_PRIORITY",
+        "TimeInTransit": "TWO_DAYS",
+        "Rate": [
+            {
+                "ShipmentRateDetail": {
+                    "RateType": "PREFERRED_LIST_SHIPMENT",
+                    "RateScale": "*FXF PZONE 01/06/20 LD 11120",
+                    "DimDivisor": "0",
+                    "FuelSurchargePercent": "21.1",
+                    "TotalBillingWeight": {
+                        "Units": "LB",
+                        "Value": "500.0"
+                    },
+                    "TotalDimWeight": {
+                        "Units": "LB",
+                        "Value": "0.0"
+                    },
+                    "TotalBaseCharge": {
+                        "Currency": "USD",
+                        "Amount": "1136.1"
+                    },
+                    "TotalFreightDiscounts": {
+                        "Currency": "USD",
+                        "Amount": "0.0"
+                    },
+                    "TotalNetFreight": {
+                        "Currency": "USD",
+                        "Amount": "1136.1"
+                    },
+                    "TotalSurcharges": {
+                        "Currency": "USD",
+                        "Amount": "1375.82"
+                    },
+                    "TotalNetFedExCharge": {
+                        "Currency": "USD",
+                        "Amount": "2511.92"
+                    },
+                    "TotalTaxes": {
+                        "Currency": "USD",
+                        "Amount": "0.0"
+                    },
+                    "TotalNetCharge": {
+                        "Currency": "USD",
+                        "Amount": "2511.92"
+                    },
+                    "TotalDutiesAndTaxes": {
+                        "Currency": "USD",
+                        "Amount": "0.0"
+                    },
+                    "TotalNetChargeWithDutiesAndTaxes": {
+                        "Currency": "USD",
+                        "Amount": "2511.92"
+                    },
+                    "FreightRateDetail": {
+                        "QuoteNumber": "1103592112",
+                        "QuoteType": "AUTOMATED",
+                        "BaseChargeCalculation": "LINE_ITEMS",
+                        "BaseCharges": {
+                            "FreightClass": "CLASS_085",
+                            "RatedAsClass": "CLASS_085",
+                            "Description": "DRUM OF OIL",
+                            "Weight": {
+                                "Units": "LB",
+                                "Value": "500.0"
+                            },
+                            "ChargeRate": {
+                                "Currency": "USD",
+                                "Amount": "227.22"
+                            },
+                            "ChargeBasis": "CWT",
+                            "ExtendedAmount": {
+                                "Currency": "USD",
+                                "Amount": "1136.1"
+                            }
+                        }
+                    },
+                    "Surcharges": {
+                        "SurchargeType": "FUEL",
+                        "Level": "SHIPMENT",
+                        "Description": "FUEL",
+                        "Amount": {
+                            "Currency": "USD",
+                            "Amount": "239.72"
+                        }
+                    }
+                    
+                }
+            }
+        ]
+    }
+}

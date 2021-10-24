@@ -1,0 +1,103 @@
+{
+	"shipFrom": {
+		"name": "SNS Freight",
+		"address": {
+			"addressLine": "1631 CHALK RILL RD",
+			"city": "DALLAS",
+			"state": "TX",
+			"postalCode": "75212",
+			"countryCode": "US",
+			"residentialAddress": false
+		},
+		"attentionName": "",
+		"tarrifPoint": ""
+	},
+	"shipTo": {
+		"name": "TestUser",
+		"address": {
+			"addressLine": "5700 Lombardo Ctr. Ste. 201",
+			"city": "Seven Hills",
+			"state": "OH",
+			"postalCode": "44130",
+			"countryCode": "US",
+			"residentialAddress": false
+		},
+		"attentionName": "Mr. Omkar",
+		"tarrifPoint": ""
+	},
+	"paymentInformation": {
+		"payer": {
+			"name": "SNS",
+			"address": {
+				"addressLine": "55 Waugh Dr # 1000",
+				"city": "Houston",
+				"state": "TX",
+				"postalCode": "77007",
+				"countryCode": "US",
+				"residentialAddress": false
+			},
+			"attentionName": "",
+			"shipperNumber": "Account Id"
+		},
+		"shipmentBillingOption": {
+			"code": "10",
+			"description": "PREPAID"
+		}
+	},
+	"service": {
+		"code": "308",
+		"description": "UPS Freight LTL"
+	},
+	"handlingUnitOne": {
+		"quantity": "50",
+		"unitType": {
+			"code": "LOO",
+			"description": "Loose"
+		}
+	},
+	"commodities": [
+		{
+			"commodityId": "DDE-A0000701432",
+			"description": "Drum of oil",
+			"weight": {
+				"value": "50",
+				"unitOfMeasurement": {
+					"code": "lbs",
+					"description": "pounds"
+				}
+			},
+			"dimensions": {
+				"length": "35",
+				"width": "24",
+				"height": "40",
+				"unitOfMeasurement": {
+					"code": "in",
+					"description": "inches"
+				}
+			},
+			"numberOfPieces": "50",
+			"paylo": "50",
+			"packagingType": {
+				"code": "PLT",
+				"description": "Pallet"
+			},
+			"dangerousGoods": false,
+			"commodityValue": {
+				"currencyCode": "USD",
+				"monetoryValue": "200.33"
+			},
+			"freightClass": "85"
+		}
+	],
+	"pickupRequest": {
+		"pickupDate": "20210927",
+		"additionalComments": "Pickup date is in EST"
+	},
+	"shipmentServiceOptions": {
+		"declaredValue": {
+			"currencyCode": "USD",
+			"monetaryValue": "2000"
+		}
+	},
+	"timeInTransit": true
+}

@@ -1,0 +1,23 @@
+{
+  "sampleData": {
+    "3cab7095-c768-4083-b7c6-6e6f8d75da90": {
+      "payload": "sample_data/json.json"
+    },
+    "8828b1eb-fe64-473d-806e-55f78f143c46": {
+      "payload": "sample_data/json_1.json"
+    },
+    "01220482-2df9-45e5-b9f9-b812e5890ce1": {
+      "payload": "sample_data/unknown.dwl"
+    },
+    "7256a714-480c-44d7-bce7-fc9f79752cbb": {
+      "payload": "sample_data/unknown_1.dwl"
+    },
+    "39ab7c66-e0c2-4312-8b4d-661b709e0958": {
+      "payload": "sample_data/json_2.json",
+      "vars-pickupDate": "sample_data/java.dwl"
+    },
+    "1d730933-0d24-4da2-a525-f56e43257c9a": {
+      "payload": "sample_data/java_1.dwl"
+    }
+  }
+}

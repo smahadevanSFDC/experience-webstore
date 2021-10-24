@@ -1,0 +1,1548 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:cloudhub="http://www.mulesoft.org/schema/mule/cloudhub" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:spring="http://www.mulesoft.org/schema/mule/spring" xmlns:validation="http://www.mulesoft.org/schema/mule/validation" xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd  http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/cloudhub http://www.mulesoft.org/schema/mule/cloudhub/current/mule-cloudhub.xsd http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd http://www.mulesoft.org/schema/mule/spring http://www.mulesoft.org/schema/mule/spring/current/mule-spring.xsd http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd">
+    <http:listener-config name="web-storefront-api-httpListenerConfig">
+        <http:listener-connection host="0.0.0.0" port="${http.private.port}" />
+    </http:listener-config>
+    <apikit:config name="web-storefront-api-config" raml="web-storefront-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="913b9c50-8de2-4cb8-b8dc-5335fd613ee6" basePath="/api">
+        <http:request-connection host="${process.host}" port="${process.port}" />
+    </http:request-config>
+    <configuration-properties doc:name="Configuration properties" doc:id="3390d737-3d98-42c5-939b-d7c7cff4edb3" file="config-${env}.properties" />
+    <cloudhub:config name="CloudHub_Config" doc:name="CloudHub Config" doc:id="b093f0a0-854a-4930-90a8-63519a5a7b43">
+        <cloudhub:connection username="${ch.username}" password="${ch.password}" environment="${environment.id}" />
+    </cloudhub:config>
+    <http:request-config name="HTTP_ORDERS" doc:name="HTTP Request configuration" doc:id="d3cf5c0e-fcdd-4b1b-97cb-5a81bdffcb00" basePath="/process-orders">
+        <http:request-connection host="${orders.process.host}" port="${orders.process.port}" />
+    </http:request-config>
+    <http:request-config name="HTTP_CUSTOMERS" doc:name="HTTP Request configuration" doc:id="91e41296-0cde-4e40-94ed-46755367e6b4" basePath="/customer-accounts">
+        <http:request-connection host="${customers.process.host}" port="${customers.process.port}"/>
+    </http:request-config>
+    <global-property doc:name="Global Property" doc:id="b8b4bd4a-e282-42b3-8238-1f93b2e50daa" name="env" value="dev" />
+    <http:request-config name="HTTPS_UPS_REQ" doc:name="HTTP Request configuration" doc:id="4091f51d-6735-4c8e-a9a0-04ef17da9bf1" basePath="/rest">
+        <http:request-connection protocol="HTTPS" host="${ups.host}" port="${ups.port}" />
+    </http:request-config>
+    <spring:config name="Spring_Config" doc:name="Spring Config" doc:id="83d5cb74-bc8b-4189-9a05-e3be58d027e5" files="beans-${env}.xml" />
+    <spring:security-manager>
+        <spring:delegate-security-provider name="memory-provider" delegate-ref="authenticationManager" />
+    </spring:security-manager>
+    <wsc:config name="Web_Service_Consumer_Config" doc:name="Web Service Consumer Config" doc:id="7ccaee3a-fb68-4435-957a-b05a310aefd3">
+        <wsc:connection wsdlLocation="wsdl/XAV.wsdl" service="XAVService" port="XAVPort" address="${ups.xav.url}" />
+    </wsc:config>
+    <wsc:config name="UPS_ParcelRate_API" doc:name="Web Service Consumer Config" doc:id="e03f1d1c-794a-4442-b7c5-05dc723ea80c">
+        <wsc:connection wsdlLocation="wsdl/RateWS.wsdl" service="RateService" port="RatePort" address="${ups.rate.url}">
+            <wsc:web-service-security actor="http://schemas.xmlsoap.org/soap/actor/next" />
+        </wsc:connection>
+    </wsc:config>
+    <configuration-properties doc:name="Configuration properties" doc:id="167f2c2d-5e2a-4dc8-accf-39c33d63cb5b" file="lookup.properties" />
+    <http:request-config name="SmartyStreets_HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="32883b48-5f74-4afa-a40c-ea733a59c79d">
+		<http:request-connection protocol="HTTPS" host="us-street.api.smartystreets.com" />
+	</http:request-config>
+	<wsc:config name="FedEx_Web_Service_Consumer_Config" doc:name="Web Service Consumer Config" doc:id="aa90c6dd-43c6-479b-93fc-c5c49c4cda7f" >
+		<wsc:connection wsdlLocation="wsdl/RateService_v28.wsdl" service="RateService" port="RateServicePort" address="https://wsbeta.fedex.com:443/web-services/rate">
+			<wsc:custom-transport-configuration >
+				<wsc:default-http-transport-configuration timeout="30000" />
+			</wsc:custom-transport-configuration>
+		</wsc:connection>
+	</wsc:config>
+	<flow name="web-storefront-api-main">
+        <http:listener config-ref="web-storefront-api-httpListenerConfig" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]" />
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="web-storefront-api-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:BAD_REQUEST">
+                <logger level="WARN" doc:name="Logger" doc:id="acec4a13-92bf-4a0d-9a74-4dd2578318bd" message="#[write(payload,'application/json',{indent:false})]" />
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="faea4ce4-9642-4709-b2df-96523b47766b">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	errorCode: error.errorType.identifier,
+	errorMessage: error.description
+}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus"><![CDATA[400]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Method not allowed"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">405</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not acceptable"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">406</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Unsupported media type"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">415</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not Implemented"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">501</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="web-storefront-api-console">
+        <http:listener config-ref="web-storefront-api-httpListenerConfig" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]" />
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="web-storefront-api-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:NOT_FOUND" enableNotifications="true" logException="true">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="post:\products\search:application\json:web-storefront-api-config">
+        <http:basic-security-filter doc:name="Basic security filter" doc:id="ca40da35-c892-4088-83da-901ca15dfa61" realm="mule-realm" />
+        <spring:authorization-filter doc:name="Authorization filter" doc:id="bd68562e-549d-41a1-ae63-b7cd70b86a6a" requiredAuthorities="ROLE_USER" />
+        <logger level="INFO" message="post:\products\search:application\json:web-storefront-api-config" category="Received search request. Contacting Process API" />
+        <http:request method="POST" doc:name="calculatePriceQtys" doc:id="694667cd-7c31-462c-957f-e0c060fb0f67" config-ref="HTTP_Request_configuration" path="/calculatePriceQtys" responseTimeout="120000">
+            <http:body><![CDATA[#[%dw 2.0
+output application/json
+---
+{  "customerId": payload.customerId,
+  "productDetails": payload.productDetails map(
+    {
+      "productId": ($.productId splitBy "-")[0],
+      "orgId": $.orgId,
+      "uomCode": $.uomCode,
+      "quantity": $.quantity,
+      "segment1": $.segment1,
+      "segment2": $.segment2,
+      "segment3": $.segment3,
+      "segment4": $.segment4
+    }
+  ),
+  (inventoryLoation: payload.inventoryLocation)if(not isEmpty(payload.inventoryLocation))
+}]]]></http:body>
+        </http:request>
+        <ee:transform doc:name="Transform Message" doc:id="e2a59f31-0af6-4460-846e-c72b0025a777">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        <error-handler>
+            <on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="5d58b61f-84c8-4d96-bdd3-0b1c164ea199" type="HTTP:BASIC_AUTHENTICATION">
+                <logger level="WARN" doc:name="Logger" doc:id="bf2b3140-aca1-4544-bf1a-45b925bc975e" message="Invalid username or password attempted" />
+                <ee:transform doc:name="Transform Message" doc:id="7d61e5ef-40cf-4b9a-bcd4-e5d28d17591f">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	success: false,
+	message: "Invalid username or password"
+}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus"><![CDATA[%dw 2.0
+output application/java
+---
+401]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-continue>
+            <on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="f7f0fb92-2e02-4116-b8d5-6ca75a94dcfc">
+                <ee:transform doc:name="Transform Message" doc:id="9a818b37-cbc0-4e47-987e-b3d43e44049d">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	errorMessage: write(error default "Error",'application/json',{indent:false}),
+	flow: "post:\products\search"
+}]]></ee:set-payload>
+                    </ee:message>
+                </ee:transform>
+                <cloudhub:create-notification domain="#[p('appName')]" doc:id="3ff1ec9c-c710-4241-b86f-5938b66d6a0d" config-ref="CloudHub_Config" priority="ERROR" />
+            </on-error-continue>
+        </error-handler>
+    </flow>
+    <flow name="post:\orders\(headerId):application\json:web-storefront-api-config">
+        <http:basic-security-filter doc:name="Basic security filter" doc:id="9c88fbb7-04ef-43dc-96a7-48038d4b8c85" realm="mule-realm" />
+        <spring:authorization-filter doc:name="Authorization filter" doc:id="0aef71dc-1154-4313-8d53-8eab20832116" requiredAuthorities="ROLE_USER" />
+        <ee:transform doc:id="43b970de-d20d-4760-a5a9-5515b44c035f">
+            <ee:variables>
+                <ee:set-variable variableName="headerId"><![CDATA[attributes.uriParams.headerId]]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <flow-ref doc:name="validateOrderLineUpdates" doc:id="20205bfb-887a-4fd9-8f39-45c797b1d06d" name="validateOrderLineUpdates" />
+        <http:request method="PATCH" doc:name="PATCH:/orders/{headerId}" doc:id="9b312c7b-c336-40cb-9449-65fd896a4218" config-ref="HTTP_ORDERS" path="/orders/{headerId}" responseTimeout="40000">
+            <http:uri-params><![CDATA[#[output application/java
+---
+{
+	"headerId" : attributes.uriParams.headerId
+}]]]></http:uri-params>
+        </http:request>
+        <logger level="INFO" message="patch:\orders\(headerId):application\json:web-storefront-api-config" />
+        <error-handler>
+            <on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="09d27db1-077b-44c1-97c0-7fd662746a1b" type="HTTP:BASIC_AUTHENTICATION">
+                <logger level="WARN" doc:name="Logger" doc:id="f60212f7-babf-4b04-95e3-1666ea3a4211" message="Invalid username or password attempted" />
+                <ee:transform doc:name="Transform Message" doc:id="5eb537f9-3c94-4bcf-bc61-b8df3bc41c9b">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	success: false,
+	message: "Invalid username or password"
+}]]></ee:set-payload>
+                    </ee:message>
+                </ee:transform>
+                <set-variable value="#[401]" doc:name="httpStatus = 401" doc:id="cfd14c20-a421-4adf-8ada-cf0104a0b29d" variableName="httpStatus" />
+            </on-error-continue>
+            <on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="02058745-ad76-4d70-8764-d480894b7664" type="VALIDATION:NOT_EMPTY_COLLECTION">
+                <logger level="WARN" doc:name="Logger" doc:id="14e9bf5e-d946-47cb-b719-0ff5b8b65d57" message="Validations failed" />
+                <ee:transform doc:name="Transform Message" doc:id="d6fa9a8c-90e0-4900-b6c8-de5546c530ab">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	success: false,
+	errorMessage: write(error default "Error",'application/json',{indent:false}),}]]></ee:set-payload>
+                    </ee:message>
+                </ee:transform>
+                <set-variable value="#[400]" doc:name="httpSatus = 400" doc:id="ffab0202-5844-479d-95e6-9a458112bfe3" variableName="httpStatus" />
+            </on-error-continue>
+        </error-handler>
+    </flow>
+    <flow name="get:\orders:web-storefront-api-config">
+        <http:basic-security-filter doc:name="Basic security filter" doc:id="ab9b637c-048f-4e2f-9de8-d1635afbb22f" realm="mule-realm" />
+        <spring:authorization-filter doc:name="Authorization filter" doc:id="926f23e9-1e98-4ff1-9f8e-24b6c7e14905" requiredAuthorities="ROLE_USER" />
+        <logger level="INFO" message="get:\orders:web-storefront-api-config" />
+        <http:request method="GET" doc:name="get:/process-orders/" doc:id="0e60d771-ae88-41da-8aa1-0ce232de2537" config-ref="HTTP_ORDERS" path="/" responseTimeout="40000">
+            <http:query-params><![CDATA[#[output application/java
+---
+{
+	"customerId" : attributes.queryParams.customerId,
+	"billToSiteId" : attributes.queryParams.billToSiteId default "",
+	"shipToSiteId" : attributes.queryParams.shipToSiteId default "",
+	"poNumber" : attributes.queryParams.poNumber default "",
+	"orderNumber" : attributes.queryParams.orderNumber default "",
+	"quoteNumber" : attributes.queryParams.quoteNumber default "",
+	"headerStatus" : attributes.queryParams.headerStatus default "",
+	"itemId" : attributes.queryParams.itemId default "",
+	"itemNumber" : attributes.queryParams.itemNumber default "",
+	"bookedInLastNDays" : attributes.queryParams.bookedInLastNDays default "",
+	"offset" : attributes.queryParams.offset default "",
+	"limit" : attributes.queryParams.limit default ""
+}]]]></http:query-params>
+        </http:request>
+        <error-handler>
+            <on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="0af42d9d-ee5e-40c1-896a-8a3e4d7bf77a" type="HTTP:BASIC_AUTHENTICATION">
+                <logger level="WARN" doc:name="Logger" doc:id="0e85f4bb-879d-449b-be53-f03da289364b" message="Invalid username or password attempted" />
+                <ee:transform doc:name="Transform Message" doc:id="968dd58d-1576-4565-a3c4-5e3076ee0523">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	success: false,
+	message: "Invalid username or password"
+}]]></ee:set-payload>
+                    </ee:message>
+                </ee:transform>
+                <set-variable value="#[401]" doc:name="httpStatus = 401" doc:id="d01df04a-b905-40e2-9835-9854eb6cd652" variableName="httpStatus" />
+            </on-error-continue>
+        </error-handler>
+    </flow>
+    <flow name="get:\orders\(headerId):web-storefront-api-config">
+        <http:basic-security-filter doc:name="Basic security filter" doc:id="fac55b7d-3fdb-4c9b-831e-4727a871a2b5" realm="mule-realm" />
+        <spring:authorization-filter doc:name="Authorization filter" doc:id="ed355e59-fa02-40f5-849a-d392f71cad90" requiredAuthorities="ROLE_USER" />
+        <ee:transform doc:id="6958bc37-cc6f-42a5-9145-63fb8c4dfc63">
+            <ee:variables>
+                <ee:set-variable variableName="headerId"><![CDATA[attributes.uriParams.headerId]]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <http:request method="GET" doc:name="get:/orders/{headerId}" doc:id="6944afac-d300-40b3-8b8f-b92d2e25d93d" config-ref="HTTP_ORDERS" path="/orders/{headerId}" responseTimeout="40000">
+            <http:uri-params><![CDATA[#[output application/java
+---
+{
+	"headerId" : vars.headerId
+}]]]></http:uri-params>
+        </http:request>
+        <logger level="INFO" message="get:\orders\(headerId):web-storefront-api-config" />
+        <error-handler>
+            <on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="39c9b01f-03ec-4c04-9afe-e769365366ef" type="HTTP:BASIC_AUTHENTICATION">
+                <logger level="WARN" doc:name="Logger" doc:id="12857c1a-0904-4f92-ade5-5ece63a0ff94" message="Invalid username or password attempted" />
+                <ee:transform doc:name="Transform Message" doc:id="84f770cf-7879-444b-9669-e491816df628">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	success: false,
+	message: "Invalid username or password"
+}]]></ee:set-payload>
+                    </ee:message>
+                </ee:transform>
+                <set-variable value="#[401]" doc:name="httpStatus = 401" doc:id="843218a8-ccc5-4d5c-a6a3-0d1b4dbc9994" variableName="httpStatus" />
+            </on-error-continue>
+        </error-handler>
+    </flow>
+    <flow name="post:\orders:application\json:web-storefront-api-config">
+        <http:basic-security-filter doc:name="Basic security filter" doc:id="c36e8a75-487b-4076-8d6a-f12cf00698ce" realm="mule-realm" />
+        <spring:authorization-filter doc:name="Authorization filter" doc:id="26394643-8946-428c-9562-462d52dd06f8" requiredAuthorities="ROLE_USER" />
+        <logger level="INFO" message="post:\orders:application\json:web-storefront-api-config" />
+        <http:request method="POST" doc:name="POST:/process-orders/create" doc:id="73f20554-d7ee-41b1-993b-23da4db58635" config-ref="HTTP_ORDERS" path="/create" responseTimeout="120000" />
+        <ee:transform doc:name="Transform Message" doc:id="2177e063-1256-4d2f-949c-1bbd5e0b6e0e">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        <error-handler>
+            <on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="8e2973f3-b1c1-405d-bcbd-e4a750f769b3" type="HTTP:BASIC_AUTHENTICATION">
+                <logger level="WARN" doc:name="Logger" doc:id="14d65491-4bb5-4d1d-9d67-b2ab24d5ada8" message="Invalid username or password attempted" />
+                <ee:transform doc:name="Transform Message" doc:id="0945fd20-099a-4ed6-9d52-0d665d815c74">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	success: false,
+	message: "Invalid username or password"
+}]]></ee:set-payload>
+                    </ee:message>
+                </ee:transform>
+                <set-variable value="#[401]" doc:name="httpStatus = 401" doc:id="d33a42bc-5288-4a5e-b849-1124b1f63474" variableName="httpStatus" />
+            </on-error-continue>
+            <on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="d770f3fc-919e-4b78-89be-c07cd0f29bbc">
+                <set-payload value="#[error.muleMessage.typedValue]" doc:name="error.muleMessage.typedValue" doc:id="18bac2e9-29da-4067-a067-42136e24c8fc" />
+                <set-variable value="500" doc:name="httpStatus" doc:id="e5ec1ba7-f675-4067-8ce1-eb4e990657ed" variableName="httpStatus" />
+                <logger level="ERROR" doc:name="Logger" doc:id="44934add-6144-491a-ac27-886ec816874b" message="Order create failed" />
+                <cloudhub:create-notification domain="#[p('appName')]" doc:name="Create Notification" doc:id="a7402fc7-fb51-401b-8418-686a98245bce" config-ref="CloudHub_Config" priority="ERROR">
+                    <cloudhub:message><![CDATA[#["Error occurred while create order. Please check logs of process-orders-api for more information"]]]></cloudhub:message>
+                </cloudhub:create-notification>
+            </on-error-continue>
+        </error-handler>
+    </flow>
+    <flow name="post:\customer\credit\calculate:web-storefront-api-config">
+        <http:basic-security-filter doc:name="Basic security filter" doc:id="3f11f764-bcd1-401c-bdf1-0dd6a1529fc4" realm="mule-realm" />
+        <spring:authorization-filter doc:name="Authorization filter" doc:id="67993c82-d3f0-4718-85ef-95231dbee4c0" requiredAuthorities="ROLE_USER" />
+        <http:request method="POST" doc:name="POST:/process-customers/credit/calculate" doc:id="78074422-0949-4d99-968a-ecd8a42a2cfb" config-ref="HTTP_CUSTOMERS" path="/credit/calculate" responseTimeout="40000" />
+        <ee:transform xsi:schemaLocation=" http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="88cd5a61-a825-4a2b-a6d9-fd13c6e71896">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        <error-handler>
+            <on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="95fe192a-1d48-474d-bce7-f62baf5d19bc" type="HTTP:BASIC_AUTHENTICATION">
+                <logger level="WARN" doc:name="Logger" doc:id="03c80358-d667-441f-a0f4-7419a58bf443" message="Invalid username or password attempted" />
+                <ee:transform doc:name="Transform Message" doc:id="065ee9c1-c77c-4460-b788-186de62668a0">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	success: false,
+	message: "Invalid username or password"
+}]]></ee:set-payload>
+                    </ee:message>
+                </ee:transform>
+                <set-variable value="#[401]" doc:name="httpStatus = 401" doc:id="d8d8425a-a967-4349-8d45-5e87995bbed1" variableName="httpStatus" />
+            </on-error-continue>
+            <on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="e3838212-3fb4-4c8c-b545-0349d59e5d63">
+                <logger level="ERROR" doc:name="Logger" doc:id="0949992f-7f54-43d8-aa1e-1ee0cbd7ab7e" message="Error occurred while credit calculation. Payload was #[write(payload default &quot;Error&quot;,'application/json',{indent:false})]" />
+                <cloudhub:create-notification doc:name="Create Notification" doc:id="cb28f784-6293-4db4-9b98-19a0add0bb6b" config-ref="CloudHub_Config" domain="#[p('appName')]">
+                    <cloudhub:message><![CDATA[Error occurred while calculating customer credit]]></cloudhub:message>
+                </cloudhub:create-notification>
+            </on-error-continue>
+        </error-handler>
+    </flow>
+    <flow name="post:\shipments\rates\ground\freight:application\json:web-storefront-api-config">
+        <http:basic-security-filter doc:name="Basic security filter" doc:id="a3992b3c-c5ac-4e87-bdde-ff4293e7f6cd" realm="mule-realm" />
+        <spring:authorization-filter doc:name="Authorization filter" doc:id="92690ef4-e073-4341-b592-cee55dcfd527" requiredAuthorities="ROLE_USER" />
+        <logger level="INFO" doc:name="Logger" doc:id="5c88e8d5-e6c0-42b8-9f75-6ccd000324b6" />
+        <set-variable value="#[output application/java var TODAY = (now() &gt;&gt; &quot;America/Chicago&quot;) as Date ---  TODAY &lt; (((payload.pickupRequest.pickupDate as String) as Date {format:&quot;yyyyMMdd&quot;}) default (TODAY))]" doc:name="pickupDate" doc:id="3cab7095-c768-4083-b7c6-6e6f8d75da90" variableName="pickupDate" />
+        <validation:is-true doc:id="517f8084-7c06-42a5-9775-a57a63a8bf60" expression="#[vars.pickupDate or payload.pickupRequest == null]" message="Invalid pickup date" doc:name="pickupDate &gt; today" />
+        <ee:transform doc:name="Transform Message" doc:id="8828b1eb-fe64-473d-806e-55f78f143c46">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+ns ns0 http://www.ups.com/XMLSchema/XOLTWS/FreightRate/v1.0
+ns ns01 http://www.ups.com/XMLSchema/XOLTWS/Common/v1.0
+---
+{
+	"UPSSecurity": {
+    "UsernameToken": {
+      "Username": p('ups.username'),
+      "Password": p('ups.password')
+    },
+    "ServiceAccessToken": {
+      "AccessLicenseNumber": p('ups.licenseNumber')
+    }
+  },
+	ns0#FreightRateRequest: {
+		ns01#Request: {
+			ns01#RequestOption: "ground",
+			ns01#SubVersion: "v1801",
+			ns01#TransactionReference: {
+				ns01#CustomerContext: "DieselDash",
+				ns01#TransactionIdentifier: ""
+			}
+		},
+		ns0#ShipFrom: {
+			ns0#Name: payload.shipFrom.name default "",
+			ns0#Address: {
+				ns0#AddressLine: payload.shipFrom.address.addressLine,
+				ns0#City: payload.shipFrom.address.city,
+				ns0#StateProvinceCode: payload.shipFrom.address.state,
+				ns0#PostalCode: payload.shipFrom.address.postalCode,
+				ns0#CountryCode: payload.shipFrom.address.countryCode,
+				(ns0#ResidentialAddressIndicator: "") if(payload.shipFrom.address.residentialAddress == true)
+			},
+			ns0#AttentionName: payload.shipFrom.attentionName
+		},
+		ns0#ShipTo: {
+			ns0#Name: payload.shipTo.name default "",
+			ns0#Address: {
+				ns0#AddressLine: payload.shipTo.address.addressLine,
+				ns0#City: payload.shipTo.address.city,
+				ns0#StateProvinceCode: payload.shipTo.address.state,
+				ns0#PostalCode: payload.shipTo.address.postalCode,
+				ns0#CountryCode: payload.shipTo.address.countryCode,
+				(ns0#ResidentialAddressIndicator: "") if(payload.shipTo.address.residentialAddress == true)
+			},
+			ns0#AttentionName: payload.shipTo.attentionName
+		},
+		ns0#PaymentInformation: {
+			ns0#Payer: {
+				ns0#Name: payload.paymentInformation.payer.name default "",
+				ns0#Address: {
+					ns0#AddressLine: payload.paymentInformation.payer.address.addressLine,
+					ns0#City: payload.paymentInformation.payer.address.city,
+					ns0#StateProvinceCode: payload.paymentInformation.payer.address.state,
+					ns0#PostalCode: payload.paymentInformation.payer.address.postalCode,
+					ns0#CountryCode: payload.paymentInformation.payer.address.countryCode,
+					(ns0#ResidentialAddressIndicator: "") if(payload.paymentInformation.payer.address.residentialAddress == true)
+				},
+				ns0#ShipperNumber: payload.paymentInformation.payer.shipperNumber default p('ups.shipperNumber'),
+				ns0#AttentionName: payload.paymentInformation.payer.attentionName
+			},
+			ns0#ShipmentBillingOption: {
+				ns0#Code: payload.paymentInformation.shipmentBillingOption.code default "",
+				ns0#Description: payload.paymentInformation.shipmentBillingOption.description
+			}
+		},
+		ns0#Service: {
+			ns0#Code: payload.service.code default "",
+			ns0#Description: payload.service.description
+		},
+		ns0#HandlingUnitOne: {
+			ns0#Quantity: payload.handlingUnitOne.quantity,
+			ns0#Type: {
+				ns0#Code: payload.handlingUnitOne.unitType.code default "",
+				ns0#Description: payload.handlingUnitOne.unitType.description
+			}
+		},
+		ns0#Commodity: payload.commodities map ({
+			ns0#CommodityID: $.commidityId,
+			ns0#Description: $.description,
+			ns0#Weight: {
+				ns0#Value: $.weight.value,
+				ns0#UnitOfMeasurement: {
+					ns0#Code: $.weight.unitOfMeasurement.code,
+					ns0#Description: $.weight.unitOfMeasurement.description
+				}
+			},
+			(ns0#Dimensions: {
+				ns0#UnitOfMeasurement: {
+					ns0#Code: $.dimensions.unitOfMeasurement.code,
+					ns0#Description: $.dimensions.unitOfMeasurement.description
+				},
+				ns0#Length: $.dimensions.length,
+				ns0#Width: $.dimensions.width,
+				ns0#Height: $.dimensions.height
+			})if(not isEmpty($.dimensions.unitOfMeasurement.code)),
+			ns0#NumberOfPieces: $.numberOfPieces,
+			ns0#PackagingType: {
+				ns0#Code: $.packagingType.code default "",
+				ns0#Description: $.packagingType.description
+			},
+			(ns0#DangerousGoodsIndicator: "") if($.dangerousGoods == true),
+			ns0#CommodityValue: {
+				ns0#CurrencyCode: $.commodityValue.currencyCode,
+				ns0#MonetaryValue: $.commodityValue.monetoryValue
+			},
+			ns0#FreightClass: $.freightClass
+		}),
+		(
+			ns0#ShipmentServiceOptions: {
+				ns0#DeclaredValue: {
+					ns0#CurrencyCode: payload.shipmentServiceOptions.declaredValue.currencyCode default "USD",
+					ns0#MonetaryValue: payload.shipmentServiceOptions.declaredValue.monetaryValue
+				}
+			}
+		)if(payload.shipmentServiceOptions != null),
+		(ns0#PickupRequest: {
+			ns0#PickupDate: payload.pickupRequest.pickupDate,
+			ns0#AdditionalComments: payload.pickupRequest.additionalComments
+		}) if(payload.pickupRequest != null),
+		(ns0#TimeInTransitIndicator: "")if(payload.timeInTransit == true)
+	}
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        <logger level="INFO" doc:name="Logger" doc:id="fb7658c3-3eef-4b40-8354-ceed9b0cc28c" message="calling UPS /rest/FreightRate" />
+        <http:request method="POST" doc:name="POST: /ups/rest/FreightRate" doc:id="1212f84f-1fd8-4d99-9cf9-b697c932c12c" config-ref="HTTPS_UPS_REQ" path="/FreightRate" responseTimeout="30000" />
+        <ee:transform doc:name="Transform Message" doc:id="01220482-2df9-45e5-b9f9-b812e5890ce1">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+fun makeArray(field) = if((typeOf(field) as String) == "Object") ([] + field) else field
+---
+if(payload.FreightRateResponse != null)(
+{
+	FreightRateResponse:{
+	Response: {
+		ResponseStatus: payload.FreightRateResponse.Response.ResponseStatus,
+		Alert: makeArray(payload.FreightRateResponse.Response.Alert),
+		TransactionReference: payload.FreightRateResponse.Response.TransactionReference
+		},
+		Rate: (payload.FreightRateResponse.Rate map (
+				$ mapObject (value,key,index)->{
+					(("Rate"++(key)) : value) if((key as String) == "Type"),
+					((key): value) if((key as String) != "Type")
+				}
+			)),
+		Commodity: makeArray(payload.FreightRateResponse.Commodity),
+		TotalShipmentCharge: payload.FreightRateResponse.TotalShipmentCharge,
+		BillableShipmentWeight: payload.FreightRateResponse.BillableShipmentWeight,
+		DimensionalWeight: payload.FreightRateResponse.DimensionalWeight,
+		Service: payload.FreightRateResponse.Service,
+		GuaranteedIndicator: payload.FreightRateResponse.GuaranteedIndicator,
+		RatingSchedule: payload.FreightRateResponse.RatingSchedule,
+		TimeInTransit: payload.FreightRateResponse.TimeInTransit
+		
+	}
+}
+)
+	else (
+		payload
+	)]]></ee:set-payload>
+            </ee:message>
+            <ee:variables />
+        </ee:transform>
+        <logger level="INFO" doc:name="Logger" doc:id="37dad9b9-601b-42ba-b0b8-2fafb34e3774" message="Received response from UPS." />
+        <error-handler>
+            <on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="47abfa1d-2d98-4f75-a68f-f9b95a2d21c8" type="VALIDATION:INVALID_BOOLEAN">
+                <logger level="INFO" doc:name="Logger" doc:id="d9013335-045f-4225-b45c-806942b9dfd9" message="Invalid pickup date passed." />
+                <ee:transform doc:name="Transform Message" doc:id="3fc83986-d205-4bd0-bbba-75b51f043118">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"errorCode": "INVALID_FIELD",
+	"errorDescription": "Invalid pickup date value. Pickup date should be greater than todays date"
+}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus"><![CDATA[%dw 2.0
+output application/java
+---
+400]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-continue>
+            <on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="0a72cd07-15c1-481d-a964-d3f0fe59642d" type="HTTP:BASIC_AUTHENTICATION">
+                <logger level="WARN" doc:name="Logger" doc:id="dca5c36c-5d6f-4253-9d51-4c9b3f499930" message="Invalid username or password attempted" />
+                <ee:transform doc:name="Transform Message" doc:id="4a2be815-a6dd-4e07-90d4-8dc9f609888c">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	success: false,
+	message: "Invalid username or password"
+}]]></ee:set-payload>
+                    </ee:message>
+                </ee:transform>
+                <set-variable value="#[401]" doc:name="httpStatus = 401" doc:id="b6247863-848d-49e5-9bcd-a8cf9a05f398" variableName="httpStatus" />
+            </on-error-continue>
+            <on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="f5b8061e-870d-44c7-9dde-205e951eadfe">
+                <logger level="ERROR" doc:name="Logger" doc:id="e931a7c0-bbb3-4707-b4c1-c7e999a82861" message="Error occurred while getting ground freight rates. Payload was #[write(payload default {},'application/json',{indent:false})] variables were #[write(vars default [], 'application/java')]" />
+                <ee:transform doc:name="Transform Message" doc:id="4f0030d9-3e74-4dab-b185-f6d33ca03628">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	success: false,
+	errorMessage: write(error default "Error",'application/json',{indent:false})
+}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus"><![CDATA[%dw 2.0
+output application/java
+---
+500]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+                <cloudhub:create-notification domain="#[p('appName')]" doc:name="Create Notification" doc:id="5a120b9f-8f50-408e-ab42-862cd1ec90a1" config-ref="CloudHub_Config" priority="ERROR">
+                    <cloudhub:message><![CDATA[#["Error occurred while getting ground freight rates."]]]></cloudhub:message>
+                </cloudhub:create-notification>
+            </on-error-continue>
+        </error-handler>
+    </flow>
+    <flow name="post:\orders\book:application\json:web-storefront-api-config">
+        <logger level="INFO" doc:name="Logger" doc:id="554e980c-8c7c-481b-ac8f-29c9cfbb5c23" message="post:\orders\(headerId)\book:web-storefront-api-config" />
+        <http:basic-security-filter doc:name="Basic security filter" doc:id="ea32b3b0-e9d5-4fa3-885e-70d3c9436ecd" realm="mule-realm" />
+        <spring:authorization-filter doc:name="Authorization filter" doc:id="345ec923-3608-4ea1-9683-5a75336a9a2f" requiredAuthorities="ROLE_USER" />
+        <ee:transform doc:name="Transform Message" doc:id="9e20d8c1-6afa-4be1-9ae5-53aeaee1284d">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        <http:request method="POST" doc:name="POST:/orders/book" doc:id="60524f4c-ea8e-4cca-98e7-053c7b208046" config-ref="HTTP_ORDERS" path="/orders/book" responseTimeout="40000" />
+        <ee:transform doc:name="Transform Message" doc:id="8961d589-dd8c-4a98-b22b-ef405be1372e">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        <set-variable value="#[201]" doc:name="httpStatus = 201" doc:id="e1d4f07f-f77f-4efe-bde0-3746375549f2" variableName="httpStatus" />
+        <error-handler>
+            <on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="154c9161-946d-4d9b-97b9-7725292bbf73" type="HTTP:BASIC_AUTHENTICATION">
+                <logger level="WARN" doc:name="Logger" doc:id="e45fa219-1e70-4211-95c4-dfb161150ff8" message="Invalid username or password attempted" />
+                <ee:transform doc:name="Transform Message" doc:id="44b7d5ad-0f16-4b19-8ef3-2d324e743d7c">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	success: false,
+	message: "Invalid username or password"
+}]]></ee:set-payload>
+                    </ee:message>
+                </ee:transform>
+                <set-variable value="#[401]" doc:name="httpStatus = 401" doc:id="184aec33-1cad-40e8-a35c-9ff1ef81f675" variableName="httpStatus" />
+            </on-error-continue>
+            <on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="5e5c9944-714e-4ffd-bf61-47b6ea889de3">
+                <set-variable value="500" doc:name="httpStatus" doc:id="835dec21-cc63-4b88-a6c7-4fa8d6e4ad78" variableName="httpStatus" />
+                <logger level="ERROR" doc:name="Logger" doc:id="728343b2-5914-4559-819b-0ec8e981eda1" message="Order book failed" />
+                <cloudhub:create-notification domain="#[p('appName')]" doc:name="Create Notification" doc:id="d5e6ca19-dd28-4c31-b9ee-3b7a57c84b63" config-ref="CloudHub_Config" priority="ERROR">
+                    <cloudhub:message><![CDATA[#["Error occurred while booking orders"]]]></cloudhub:message>
+                </cloudhub:create-notification>
+            </on-error-continue>
+        </error-handler>
+    </flow>
+    <flow name="post:\orders\cancel:application\json:web-storefront-api-config">
+        <logger level="INFO" doc:name="Logger" doc:id="aff0cddf-b3db-42dc-9c1c-f8ed9566eccd" message="post:\orders\(headerId)\book:web-storefront-api-config" />
+        <http:basic-security-filter doc:name="Basic security filter" doc:id="3f2b5aa6-ae30-41d4-86e1-8aed66367a1c" realm="mule-realm" />
+        <spring:authorization-filter doc:name="Authorization filter" doc:id="e8d44677-f38e-4ba4-a5d0-db58571ea0f7" requiredAuthorities="ROLE_USER" />
+        <ee:transform doc:name="Transform Message" doc:id="de4de90d-be40-492e-91e2-4d7f1c520de6">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        <http:request method="POST" doc:name="POST:/orders/book" doc:id="edcdf9e7-4c6d-4bf5-9cef-b2fdb16980c8" config-ref="HTTP_ORDERS" path="/orders/cancel" responseTimeout="40000" />
+        <ee:transform doc:name="Transform Message" doc:id="23df4370-0f58-46ec-b93d-a6f04584b65e">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        <set-variable value="#[201]" doc:name="httpStatus = 201" doc:id="11db355f-92fc-4496-9e4f-97c074886b88" variableName="httpStatus" />
+        <error-handler>
+            <on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="e4de0b08-f279-4287-864c-85d71fa5172d" type="HTTP:BASIC_AUTHENTICATION">
+                <logger level="WARN" doc:name="Logger" doc:id="11e7bdff-ae57-492c-bf93-2ca89f2b5ecf" message="Invalid username or password attempted" />
+                <ee:transform doc:name="Transform Message" doc:id="b22c7567-5ed1-4822-be81-29557d144fe5">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	success: false,
+	message: "Invalid username or password"
+}]]></ee:set-payload>
+                    </ee:message>
+                </ee:transform>
+                <set-variable value="#[401]" doc:name="httpStatus = 401" doc:id="695473f6-e2aa-4e87-89af-5a73071c529f" variableName="httpStatus" />
+            </on-error-continue>
+            <on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="7935843b-7ebb-442d-bd4d-ff66c729cd03">
+                <set-variable value="500" doc:name="httpStatus" doc:id="cfa9663f-adf1-49f8-b9e5-859ebdbaf54d" variableName="httpStatus" />
+                <logger level="ERROR" doc:name="Logger" doc:id="ed119d39-03a5-4b53-b6e4-96b994c8f6a7" message="Order book failed" />
+                <cloudhub:create-notification domain="#[p('appName')]" doc:name="Create Notification" doc:id="9f5b234e-c51e-41a8-95c4-181e4e0be55c" config-ref="CloudHub_Config" priority="ERROR">
+                    <cloudhub:message><![CDATA[#["Error occurred while canceling orders"]]]></cloudhub:message>
+                </cloudhub:create-notification>
+            </on-error-continue>
+        </error-handler>
+    </flow>
+    <flow name="post:\customer\addresses\validate:application\json:web-storefront-api-config">
+        <logger level="INFO" message="post:\customer\addresses\validate:application\json:web-storefront-api-config" />
+        <http:basic-security-filter doc:name="Basic security filter" doc:id="76e83bb6-4c5d-44b3-87ca-d8b5118ed029" realm="mule-realm" />
+        <spring:authorization-filter doc:name="Authorization filter" doc:id="d38b47f9-56fe-4d7f-9404-9e8f114e2dd3" requiredAuthorities="ROLE_USER" />
+        <set-variable value="#[output application/json --- payload]" doc:name="originalReq" doc:id="062c4362-0488-4bda-bda2-c9732c6a3197" variableName="originalReq" />
+        <logger level="INFO" doc:name="Logger" doc:id="bd052758-00c0-42e3-bb15-fd9277f109ab" message="Sending request to smartystreets for address standardization" />
+		<http:request method="GET" doc:name="Request" doc:id="c42984a9-9b34-45b9-860f-b88c31fa0e30" config-ref="SmartyStreets_HTTP_Request_configuration" path="/street-address">
+			<http:query-params ><![CDATA[#[output application/json
+---
+{	
+	"addressee": payload.businessName,
+	"candidates":"1",
+	"street":payload.line1 ++ " " ++ payload.line2 ++ " " ++ payload.line3,
+	"city":payload.city,
+	"state":payload.stateCode,
+	"zipcode":payload.zip,
+	"auth-id":p('ss.authId'),
+	"auth-token":p('ss.authToken')
+}]]]></http:query-params>
+		</http:request>
+        <logger level="INFO" doc:name="Logger" doc:id="28d4fba0-30b2-484b-b7d8-e24f5f6a06e3" message="Received response from smartystreets" />
+        <ee:transform doc:name="Transform Message" doc:id="e9c80ceb-5cb0-4d5a-ac7d-2d32fd53c1df">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        <error-handler>
+            <on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="c755e0de-4c9b-45db-aa39-6cf696e0708a" type="HTTP:BASIC_AUTHENTICATION">
+                <logger level="WARN" doc:name="Logger" doc:id="f8e7027f-2cc7-4d1a-b453-9540a1611536" message="Invalid username or password attempted" />
+                <ee:transform doc:name="Transform Message" doc:id="1e3b9139-253e-4d0b-9dd9-a57bd6f3204a">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	success: false,
+	message: "Invalid username or password"
+}]]></ee:set-payload>
+                    </ee:message>
+                </ee:transform>
+                <set-variable value="#[401]" doc:name="httpStatus = 401" doc:id="f4ee1103-40c7-4596-b736-20400ccd6316" variableName="httpStatus" />
+            </on-error-continue>
+            <on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="c2884725-a2fd-4c75-a69b-ce9444f6b363">
+                <set-variable value="500" doc:name="httpStatus" doc:id="9b61c216-55e0-439c-b683-3b606ace6f0a" variableName="httpStatus" />
+                <logger level="INFO" doc:name="Logger" doc:id="8ed9c53c-52bb-4f8b-97d7-84d29eeb6f77" message="Original Request was #[write(vars.originalReq,'application/json',{indent:false})]" />
+                <logger level="ERROR" doc:name="Logger" doc:id="8d1dcd50-e986-46c6-b197-ba2417800af0" message="Failed to retrieve valid address. Error was #[write((error.errorMessage.payload.detail default &quot;Error&quot;),'application/java')]" />
+                <cloudhub:create-notification domain="#[p('appName')]" doc:name="Create Notification" doc:id="c5caed23-9c1e-48cd-94a7-8642ae61e3cf" config-ref="CloudHub_Config" priority="ERROR">
+                    <cloudhub:message><![CDATA[#["Error occurred during address standardization"]]]></cloudhub:message>
+                </cloudhub:create-notification>
+                <ee:transform doc:name="Transform Message" doc:id="3a5bfd64-aced-4d71-ba92-d275755c17d0">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	success:"U",
+	error: write(error.errorMessage.payload.detail default "Error",'application/java')
+}]]></ee:set-payload>
+                    </ee:message>
+                </ee:transform>
+            </on-error-continue>
+        </error-handler>
+    </flow>
+    <flow name="post:\shipments\rates\parcel:application\json:web-storefront-api-config">
+        <logger level="INFO" message="post:\shipments\rates\parcel:application\json:web-storefront-api-config" />
+        <http:basic-security-filter doc:name="Basic security filter" doc:id="f8982c2b-aaed-4c23-a4df-b11f9bb42237" realm="mule-realm" />
+        <spring:authorization-filter doc:name="Authorization filter" doc:id="f80eb586-a183-4158-94cf-232c2ecb78c9" requiredAuthorities="ROLE_USER" />
+        <set-variable value="#[output application/json --- payload]" doc:name="originalReq" doc:id="a7158fdf-1c2a-4119-a110-0a96cd13c79e" variableName="originalReq" />
+        <ee:transform doc:name="Transform Message" doc:id="ee07a58b-5014-442e-9d60-69c828d1280e">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/xml
+ns v11 http://www.ups.com/XMLSchema/XOLTWS/Rate/v1.1
+ns v12 http://www.ups.com/XMLSchema/XOLTWS/Common/v1.0
+---
+{
+	v11#RateRequest: {
+		v12#Request: {
+			v12#RequestOption: "Rate"
+		},
+		v11#Shipment: {
+			v11#Shipper: {
+				v11#Name: payload.shipment.shipper.name,
+				v11#ShipperNumber: p('ups.shipperNumber'),
+				v11#Address: {
+					v11#AddressLine: payload.shipment.shipper.address.line1,
+					v11#City: payload.shipment.shipper.address.city,
+					v11#StateProvinceCode: payload.shipment.shipper.address.state,
+					v11#PostalCode: payload.shipment.shipper.address.zip,
+					v11#CountryCode: payload.shipment.shipper.address.country default "",
+					(v11#AddressLine: payload.shipment.shipper.address.line2)if(not isEmpty(payload.shipment.shipper.address.line2)),
+					(v11#AddressLine: payload.shipment.shipper.address.line3)if(not isEmpty(payload.shipment.shipper.address.line3)),
+				}
+			},
+			v11#ShipTo: {
+				v11#Name: payload.shipment.shipTo.name,
+				v11#Address: {
+					v11#AddressLine: payload.shipment.shipTo.address.line1,
+					(v11#AddressLine: payload.shipment.shipTo.address.line2)if(not isEmpty(payload.shipment.shipTo.address.line2)),
+					(v11#AddressLine: payload.shipment.shipTo.address.line3)if(not isEmpty(payload.shipment.shipTo.address.line3)),
+					v11#City: payload.shipment.shipTo.address.city,
+					v11#StateProvinceCode: payload.shipment.shipTo.address.state,
+					v11#PostalCode: payload.shipment.shipTo.address.zip,
+					v11#CountryCode: payload.shipment.shipTo.address.country
+				}
+			},
+			v11#ShipFrom: {
+				v11#Name: payload.shipment.shipFrom.name,
+				v11#Address: {
+					v11#AddressLine: payload.shipment.shipFrom.address.line1,
+					v11#City: payload.shipment.shipFrom.address.city,
+					v11#StateProvinceCode: payload.shipment.shipFrom.address.state,
+					v11#PostalCode: payload.shipment.shipFrom.address.zip,
+					v11#CountryCode: payload.shipment.shipFrom.address.country,
+					(v11#AddressLine: payload.shipment.shipFrom.address.line2)if(not isEmpty(payload.shipment.shipFrom.address.line2)),
+					(v11#AddressLine: payload.shipment.shipFrom.address.line3)if(not isEmpty(payload.shipment.shipFrom.address.line3)),
+				}
+			},
+			v11#Service: {
+				v11#Code: p((payload.shipment.service) replace " " with ""),
+				v11#Description: payload.shipment.service
+			},
+			v11#ShipmentTotalWeight: {
+				v11#UnitOfMeasurement: {
+					v11#Code: payload.shipment.shipmentWeightUom
+				},
+				v11#Weight: payload.shipment.shipmentWeight as String
+			},
+			v11#Package: {
+				v11#PackagingType: {
+					v11#Code: "00"
+				},
+				v11#PackageWeight: {
+					v11#UnitOfMeasurement: {
+						v11#Code: payload.shipment.packageWeightUom
+					},
+					v11#Weight: payload.shipment.packageWeight as String
+				},
+				(v11#PackageServiceOptions: {
+					v11#DeclaredValue: {
+						v11#CurrencyCode: payload.shipment.packageServiceOptions.declaredValue.currencyCode default "USD",
+						v11#MonetaryValue: payload.shipment.packageServiceOptions.declaredValue.monetaryValue
+					}
+				}) if(payload.packageServiceOptions != null),
+			},
+			v11#ShipmentRatingOptions: {
+				v11#NegotiatedRatesIndicator: null
+			},
+			(v11#TaxInformationIndicator: null)if(payload.shipment.taxInfoIndicator == true)
+		}
+	}
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        <wsc:consume doc:name="Consume" doc:id="4d459fc2-b482-4003-adb4-51761318a07c" config-ref="UPS_ParcelRate_API" operation="ProcessRate">
+            <wsc:message>
+                <wsc:headers><![CDATA[#[%dw 2.0
+output application/xml
+ns ns0 http://www.ups.com/XMLSchema/XOLTWS/UPSS/v1.0
+---
+{
+	headers: {
+			ns0#UPSSecurity: {
+				ns0#UsernameToken: {
+					ns0#Username: p('ups.username'),
+					ns0#Password: p('ups.password')
+				},
+				ns0#ServiceAccessToken: {
+					ns0#AccessLicenseNumber: p('ups.licenseNumber')
+				}
+			}
+	}
+}]]]></wsc:headers>
+            </wsc:message>
+        </wsc:consume>
+        <ee:transform doc:name="Transform Message" doc:id="d98ce495-cc14-4b0d-8157-a90c338ed0e4">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+fun makeArray(field) = if(typeOf(field) as String == "Object")([] + field) else field
+---
+{
+	response:{
+		responseStatus: payload.body.RateResponse.Response.ResponseStatus,
+		Alert: makeArray(payload.body.RateResponse.Response.Alert)
+	},
+	ratedShipment:{
+		service: payload.body.RateResponse.RatedShipment.Service,
+		billingWeight: payload.body.RateResponse.RatedShipment.BillingWeight,
+		transportationCharge: payload.body.RateResponse.RatedShipment.TransportationCharges,
+		negotiatedRateCharges: payload.body.RateResponse.RatedShipment.NegotiatedRateCharges
+	},
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        <error-handler>
+            <on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="ac72f254-13f9-4e0c-99fb-4ed3a51fcf06" type="HTTP:BASIC_AUTHENTICATION">
+                <logger level="WARN" doc:name="Logger" doc:id="27bc2a5c-5f0e-4b68-9349-2d05f92d7509" message="Invalid username or password attempted" />
+                <ee:transform doc:name="Transform Message" doc:id="9b8bab92-18d9-4598-9fd7-705d04b04d78">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	success: false,
+	message: "Invalid username or password"
+}]]></ee:set-payload>
+                    </ee:message>
+                </ee:transform>
+                <set-variable value="#[401]" doc:name="httpStatus = 401" doc:id="af5d6e26-c281-45c0-bd1a-cfd9dc965f44" variableName="httpStatus" />
+            </on-error-continue>
+            <on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="4759a945-b6ed-4764-bc91-244cf2e14a69">
+                <set-variable value="500" doc:name="httpStatus" doc:id="5c2cf711-b456-4b10-83e7-34f6ec63f3c2" variableName="httpStatus" />
+                <logger level="INFO" doc:name="Logger" doc:id="331b1519-0c49-4bee-9cd6-274a5184f405" message="Original Request was #[write(vars.originalReq,'application/json',{indent:false})]" />
+                <logger level="ERROR" doc:name="Logger" doc:id="6b2259d6-3dcd-4b7e-9c2b-1c0a1281c9bf" message="Failed to retrieve UPS parcel rates. Error was #[write((error.errorMessage.payload.detail default &quot;Error&quot;),'application/java')]" />
+                <cloudhub:create-notification domain="#[p('appName')]" doc:name="Create Notification" doc:id="e94ea97b-0510-49e9-8805-9b473c5f919e" config-ref="CloudHub_Config" priority="ERROR">
+                    <cloudhub:message><![CDATA[#["Error occurred while getting UPS Parcel rates"]]]></cloudhub:message>
+                </cloudhub:create-notification>
+                <ee:transform doc:name="Transform Message" doc:id="7793d5bb-96b6-47b8-a84f-da6cadfc59c9">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	success:"U",
+	error: write(error.errorMessage.payload.detail default "Error",'application/java')
+}]]></ee:set-payload>
+                    </ee:message>
+                </ee:transform>
+            </on-error-continue>
+        </error-handler>
+    </flow>
+    <flow name="post:\customer\(custAccountNumber)\addresses:application\json:web-storefront-api-config">
+        <set-variable value="#[output application/java --- attributes.uriParams.custAccountNumber]" doc:name="custAccountNumber" doc:id="09ea5449-6380-4410-acb2-166cba8ca13e" variableName="custAccountNumber" />
+        <logger level="INFO" doc:name="Logger" doc:id="e8d4dc92-89d0-4f26-be60-e66580973c29" message="Received request to create an address for customer #[attributes.uriParams.custAccountNumber]" />
+        <http:basic-security-filter doc:name="Basic security filter" doc:id="d601a27f-1f12-45f7-a6bb-588d8f54ed9f" realm="mule-realm" />
+        <spring:authorization-filter doc:name="Authorization filter" doc:id="39839852-d948-4bbb-b400-1355b1dc8e88" requiredAuthorities="ROLE_USER" />
+        <set-variable value="#[output application/json --- payload]" doc:name="originalReq" doc:id="af235acb-3893-45fb-a20f-fe59c0ac805e" variableName="originalReq" />
+        <logger level="INFO" doc:name="Logger" doc:id="073dcd9e-8b76-4c0f-9e0b-7227f11a19d2" message="Sending request to process-customer-api" />
+        <http:request method="POST" doc:name="POST:process-customers/customers/{customerId}/addresses" doc:id="be3527f7-f9bf-43db-9d89-4283e010dbbd" config-ref="HTTP_CUSTOMERS" path="/{customerId}/addresses" responseTimeout="120000">
+            <http:uri-params><![CDATA[#[output application/java
+---
+{
+	"customerId" : vars.custAccountNumber
+}]]]></http:uri-params>
+        </http:request>
+        <logger level="INFO" doc:name="Logger" doc:id="9d018977-8bbe-498b-b95e-f87aa4432e0b" message="Received response from process-customers-api" />
+        <ee:transform doc:name="Transform Message" doc:id="f6b8862a-0f38-41b3-977e-c656e33ddd93">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        <error-handler>
+            <on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="59e200f7-5ae2-40c5-b138-91fdc21c4f93" type="HTTP:BASIC_AUTHENTICATION">
+                <logger level="WARN" doc:name="Logger" doc:id="674c1c04-88a7-4c32-9281-1a21b654152a" message="Invalid username or password attempted" />
+                <ee:transform doc:name="Transform Message" doc:id="9bcf9d29-cf07-440a-a5c0-cfeedf062c7b">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	success: false,
+	message: "Invalid username or password"
+}]]></ee:set-payload>
+                    </ee:message>
+                </ee:transform>
+                <set-variable value="#[401]" doc:name="httpStatus = 401" doc:id="bef8e930-1326-49d5-91a5-49419c24248a" variableName="httpStatus" />
+            </on-error-continue>
+            <on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="ca2d0483-412d-4e79-9879-6d8d1ec43c8f">
+                <set-variable value="500" doc:name="httpStatus" doc:id="63e618ab-3fe9-42e0-afe2-e26c1a00ce8c" variableName="httpStatus" />
+                <logger level="ERROR" doc:name="Logger" doc:id="ff78e0da-e608-43d3-9f59-1498d5a258d9" message="Address creation failed" />
+                <cloudhub:create-notification domain="#[p('appName')]" doc:name="Create Notification" doc:id="21668191-58d6-42c5-816b-7522d3c39ec4" config-ref="CloudHub_Config" priority="ERROR">
+                    <cloudhub:message><![CDATA[#["Error occurred while creating an address for a customer."]]]></cloudhub:message>
+                </cloudhub:create-notification>
+            </on-error-continue>
+        </error-handler>
+    </flow>
+    <flow name="post:\customer:application\json:web-storefront-api-config">
+        <logger level="INFO" doc:name="Logger" doc:id="7385a307-8113-4b9a-8d11-bf70fdb0250b" message="Received a request to register a new customer" />
+        <http:basic-security-filter doc:name="Basic security filter" doc:id="141a6bb1-4808-4f8d-b54c-75022357cabe" realm="mule-realm" />
+        <spring:authorization-filter doc:name="Authorization filter" doc:id="bc96040a-1781-4130-8133-bf1bce4f2ccf" requiredAuthorities="ROLE_USER" />
+        <set-variable value="#[output application/json --- payload]" doc:name="originalReq" doc:id="d5bcb0ca-d446-4ccd-bed6-d5334d8081df" variableName="originalReq" />
+        <logger level="INFO" doc:name="Logger" doc:id="e5dd69d5-1580-42b6-b249-720a340d48d0" message="Sending request to process-customers-api/customers to register a new customer in EBS" />
+        <http:request method="POST" doc:name="POST:process-customers-api/customer-accounts" doc:id="cbc4b2a3-15e2-42b1-a194-4f422aabc32d" config-ref="HTTP_CUSTOMERS" responseTimeout="120000" url="http://${customers.process.host}:${customers.process.port}/customer-accounts" />
+        <logger level="INFO" doc:name="Logger" doc:id="5cf46866-ee19-4f9f-8384-33b805739e6e" message="Received response from process-customers-api" />
+        <ee:transform doc:name="Transform Message" doc:id="758534b4-72e0-4b6e-b424-fb1fd65bdd02">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        <error-handler>
+            <on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="1fbf0a9c-4633-47f7-a4fd-60fc2db3b249" type="HTTP:BASIC_AUTHENTICATION">
+                <logger level="WARN" doc:name="Logger" doc:id="6a49e838-23fe-4832-945c-02bdd69f6938" message="Invalid username or password attempted" />
+                <ee:transform doc:name="Transform Message" doc:id="dfcf27e7-8d5b-4df6-8120-e3c2216b8d48">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	success: false,
+	message: "Invalid username or password"
+}]]></ee:set-payload>
+                    </ee:message>
+                </ee:transform>
+                <set-variable value="#[401]" doc:name="httpStatus = 401" doc:id="11b4ab79-f818-454b-a333-4985b76ed714" variableName="httpStatus" />
+            </on-error-continue>
+            <on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="29ba5a86-a00b-43d1-b39d-b22cb9d332e9">
+                <set-variable value="500" doc:name="httpStatus" doc:id="74adf890-2f6f-403c-8b06-7ae4a5115818" variableName="httpStatus" />
+                <logger level="ERROR" doc:name="Logger" doc:id="5db68762-7506-4333-90fd-eb74586cdc05" message="Customer registration failed." />
+                <cloudhub:create-notification domain="#[p('appName')]" doc:name="Create Notification" doc:id="22c2da6d-1616-4aed-8e3d-4b190dd8d245" config-ref="CloudHub_Config" priority="ERROR">
+                    <cloudhub:message><![CDATA[#["Error occurred while registering a customer."]]]></cloudhub:message>
+                </cloudhub:create-notification>
+            </on-error-continue>
+        </error-handler>
+    </flow>
+    <flow name="post:\orders\returns:application\json:web-storefront-api-config">
+        <logger level="INFO" doc:name="Logger" doc:id="14c7ee5b-e223-4ccc-af8b-5ceaa344eecc" message="Received a request to create order returns" />
+        <http:basic-security-filter doc:name="Basic security filter" doc:id="f8db1e6f-2626-439b-a2d5-e29268fc609a" realm="mule-realm" />
+        <spring:authorization-filter doc:name="Authorization filter" doc:id="acb76ad5-f06f-4500-bce4-3cce1a952ffa" requiredAuthorities="ROLE_USER" />
+        <set-variable value="#[output application/json --- payload]" doc:name="originalReq" doc:id="c7f7cf10-2ef5-4643-bade-5ba36ece888b" variableName="originalReq" />
+        <logger level="INFO" doc:name="Logger" doc:id="8e052c9a-68cc-4fed-9009-74af2a2a3d60" message="Sending request to process-orders-api/orders/returns to create a return order in EBS" />
+        <http:request method="POST" doc:name="POST:/orders/returns" doc:id="1f2973fd-efa6-4283-8dcd-49d2ff4810d0" config-ref="HTTP_ORDERS" path="/orders/returns" responseTimeout="40000" />
+        <logger level="INFO" doc:name="Logger" doc:id="5ee9a9af-4052-4d3c-b522-079eea7f0b45" message="Received response from process-customers-api" />
+        <ee:transform doc:name="Transform Message" doc:id="7eb9c594-7a3f-4f68-bbca-6aee789f6130">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        <error-handler>
+            <on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="f6a737df-d127-4148-b9d8-625fb383bb0d" type="HTTP:BASIC_AUTHENTICATION">
+                <logger level="WARN" doc:name="Logger" doc:id="52f9b312-6d38-404a-8243-ce2b109a6f39" message="Invalid username or password attempted" />
+                <ee:transform doc:name="Transform Message" doc:id="38a62862-7c58-4b34-9040-e1d4449d1269">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	success: false,
+	message: "Invalid username or password"
+}]]></ee:set-payload>
+                    </ee:message>
+                </ee:transform>
+                <set-variable value="#[401]" doc:name="httpStatus = 401" doc:id="2a31b18f-8f11-4662-942c-34afdb13dc6a" variableName="httpStatus" />
+            </on-error-continue>
+            <on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="67daab66-751f-430e-b454-bae000696fb2">
+                <set-variable value="500" doc:name="httpStatus" doc:id="1491ec51-bbcb-4b11-93eb-83e7ec2c1948" variableName="httpStatus" />
+                <logger level="ERROR" doc:name="Logger" doc:id="03791069-3a4d-4582-b5fb-f4077a1df114" message="Order returns creation failed. Original request was #[write(vars.originalRequest,'application/json',{indent:false})]." />
+                <cloudhub:create-notification domain="#[p('appName')]" doc:name="Create Notification" doc:id="bc5e77f5-0062-4659-bca0-5d64a76afc2a" config-ref="CloudHub_Config" priority="ERROR">
+                    <cloudhub:message><![CDATA[#["Error occurred while creating order returns"]]]></cloudhub:message>
+                </cloudhub:create-notification>
+            </on-error-continue>
+        </error-handler>
+    </flow>
+    <flow name="post:\customer\(custAccountNumber)\addresses\(contactAddrId):application\json:web-storefront-api-config">
+        <ee:transform>
+            <ee:variables>
+                <ee:set-variable variableName="custAccountNumber">attributes.uriParams.'custAccountNumber'</ee:set-variable>
+                <ee:set-variable variableName="contactAddrId">attributes.uriParams.'contactAddrId'</ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <http:basic-security-filter doc:name="Basic security filter" doc:id="21752cbd-aa2f-49a1-a28e-9a9ce43e1705" realm="mule-realm" />
+        <spring:authorization-filter doc:name="Authorization filter" doc:id="8d184768-2f5d-46fa-a7c0-493176a9ffd3" requiredAuthorities="ROLE_USER" />
+        <set-variable value="#[output application/json --- payload]" doc:name="originalReq" doc:id="7a1002a9-6243-4d48-a348-02b42b6ed231" variableName="originalReq" />
+        <logger level="INFO" doc:name="Logger" doc:id="bda53461-a9ee-46c5-b1f4-5191935f9e73" message="Received request to update customer #[vars.custAccountNumber] address #[vars.contactAddrId]. Sending payload to process-customers-api" />
+        <http:request method="PATCH" doc:name="PATCH:process-customers/customer-accounts/{customerId}/addresses/{siteId}" doc:id="0834983b-d4d4-4fc8-b2b5-ac86d23d6c30" config-ref="HTTP_CUSTOMERS" path="/{customerId}/addresses/{siteId}">
+            <http:uri-params><![CDATA[#[output application/java
+---
+{
+	"siteId" : vars.contactAddrId,
+	"customerId" : vars.custAccountNumber
+}]]]></http:uri-params>
+        </http:request>
+        <logger level="INFO" doc:name="Logger" doc:id="5082a2c9-26b7-4d11-b402-81e382cc002a" message="Received response from process-customers-api for customer #[vars.custAccountNumber] and addressId #[vars.contactAddrId]" />
+        <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        <error-handler>
+            <on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="9b1e6f5c-6c20-4bb6-b62e-4c933bec7f43" type="HTTP:BASIC_AUTHENTICATION">
+                <logger level="WARN" doc:name="Logger" doc:id="a3d647b9-5ba9-4957-a4ff-29855c4cf4a9" message="Invalid username or password attempted" />
+                <ee:transform doc:name="Transform Message" doc:id="1b87ca2e-7538-44fe-99f5-4f4c081ebc4a">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	success: false,
+	message: "Invalid username or password"
+}]]></ee:set-payload>
+                    </ee:message>
+                </ee:transform>
+                <set-variable value="#[401]" doc:name="httpStatus = 401" doc:id="d769eda9-b5cc-4511-99ff-63f38f85b59c" variableName="httpStatus" />
+            </on-error-continue>
+            <on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="bfc14c6c-107b-4a1a-bc95-6f547b12fd8a">
+                <set-variable value="500" doc:name="httpStatus" doc:id="e8021a76-06df-41a3-959a-024870c4a8c1" variableName="httpStatus" />
+                <logger level="ERROR" doc:name="Logger" doc:id="ba13ac4a-a884-4e3c-8bc7-cc4f6b322314" message="Error occurred while updating address for a customer. Original request was #[write(vars.originalRequest,'application/json',{indent:false})]." />
+                <cloudhub:create-notification domain="#[p('appName')]" doc:name="Create Notification" doc:id="0c0dcfad-f3d1-4c5a-b7c4-949f067d9496" config-ref="CloudHub_Config" priority="ERROR">
+                    <cloudhub:message><![CDATA[#["Error occurred while updating address of customer " ++ (vars.custAccountNumber default "")]]]></cloudhub:message>
+                </cloudhub:create-notification>
+            </on-error-continue>
+        </error-handler>
+    </flow>
+    <flow name="post:\customer\(custAccountNumber)\addresses\emails\(emailContactAddrId):application\json:web-storefront-api-config">
+        <ee:transform doc:id="e803faec-b2cd-474f-9b90-699ad340e0e3">
+            <ee:variables>
+                <ee:set-variable variableName="custAccountNumber"><![CDATA[attributes.uriParams.'custAccountNumber']]></ee:set-variable>
+                <ee:set-variable variableName="emailContactAddrId"><![CDATA[attributes.uriParams.'emailContactAddrId']]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+		<http:basic-security-filter doc:name="Basic security filter" doc:id="b8862741-de8d-43f8-b28f-c6bb5caea819" realm="mule-realm" />
+		<spring:authorization-filter doc:name="Authorization filter" doc:id="a243854b-2627-45b0-bd60-41e851b03ef8" requiredAuthorities="ROLE_USER" />
+		<set-variable value="#[output application/json --- payload]" doc:name="originalReq" doc:id="3ff9b415-58d6-4281-8b28-23a862982f8e" variableName="originalReq" />
+		<logger level="INFO" doc:name="Logger" doc:id="47436c95-710c-4231-b15e-32459dd2a95e" message="Received request to update customer #[vars.custAccountNumber] email #[vars.emailContactAddrId]. Sending payload to process-customers-api" />
+		<http:request method="PATCH" doc:name="PATCH:process-customers/customer-accounts/{customerId}/addresses/emails/{emailSiteId}" doc:id="b90299f8-1fed-4b53-95fa-6fcfc73779fe" config-ref="HTTP_CUSTOMERS" path="/{customerId}/addresses/emails/{emailSiteId}" >
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"customerId" : vars.custAccountNumber,
+	"emailSiteId" : vars.emailContactAddrId
+}]]]></http:uri-params>
+		</http:request>
+		<logger level="INFO" doc:name="Logger" doc:id="ea34fb41-3b06-47b7-ad1f-ec999516afe5" message="Received response from process-customers-api for customer #[vars.custAccountNumber] and email Id #[vars.emailContactAddrId]" />
+		<ee:transform doc:name="Transform Message" doc:id="14f6b98d-c1ee-4a83-9f37-52157e539db1" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="521dbe61-32b8-412c-a725-e2c4c0212835" type="HTTP:BASIC_AUTHENTICATION" >
+				<logger level="WARN" doc:name="Logger" doc:id="2523a73f-b218-490f-ac26-c928b1495350" message="Invalid username or password attempted" />
+				<ee:transform doc:name="Transform Message" doc:id="81b222fa-da88-4d82-875b-8c28354f71f2" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	success: false,
+	message: "Invalid username or password"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<set-variable value="#[401]" doc:name="httpStatus = 401" doc:id="2f0ca4c5-74b2-45b2-90ca-e44751bb7213" variableName="httpStatus" />
+			</on-error-continue>
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="e66ed9e0-22e3-4efd-817e-c42ffb6f06eb" >
+				<set-variable value="500" doc:name="httpStatus" doc:id="9d06b3c8-b31d-4eb5-824c-2ea32c95d858" variableName="httpStatus" />
+				<logger level="ERROR" doc:name="Logger" doc:id="3c600dc5-c325-4867-ae0e-b919a63bdc4e" message="Error occurred while updating address for a customer. Original request was #[write(vars.originalRequest,'application/json',{indent:false})]." />
+				<cloudhub:create-notification domain="#[p('appName')]" doc:name="Create Notification" doc:id="0994c506-237f-4729-90b6-144bdd2def1d" config-ref="CloudHub_Config" priority="ERROR" >
+					<cloudhub:message ><![CDATA[#["Error occurred while updating email address of customer " ++ (vars.custAccountNumber default "")]]]></cloudhub:message>
+				</cloudhub:create-notification>
+			</on-error-continue>
+		</error-handler>
+    </flow>
+    <flow name="post:\customer\(custAccountNumber)\addresses\phones\(phoneContactAddrId):application\json:web-storefront-api-config">
+        <ee:transform doc:id="268fbd1c-9d06-4cf5-bfea-5957f3c92615">
+            <ee:variables>
+                <ee:set-variable variableName="custAccountNumber"><![CDATA[attributes.uriParams.'custAccountNumber']]></ee:set-variable>
+                <ee:set-variable variableName="phoneContactAddrId"><![CDATA[attributes.uriParams.'phoneContactAddrId']]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+		<http:basic-security-filter doc:name="Basic security filter" doc:id="95b09354-b98b-4d97-a632-8408505eee62" realm="mule-realm" />
+		<spring:authorization-filter doc:name="Authorization filter" doc:id="d0b582ca-a76d-4378-8185-a7c9b9df9353" requiredAuthorities="ROLE_USER" />
+		<set-variable value="#[output application/json --- payload]" doc:name="originalReq" doc:id="5c44c2ee-2896-4358-bcde-78e6acf6d02a" variableName="originalReq" />
+		<logger level="INFO" doc:name="Logger" doc:id="a3f3adbc-bf63-4c8a-92af-49f86760cf76" message="Received request to update customer #[vars.custAccountNumber] phone #[vars.phoneContactAddrId]. Sending payload to process-customers-api" />
+		<http:request method="PATCH" doc:name="PATCH:process-customers/customer-accounts/{customerId}/addresses/phone/{phoneSiteId}" doc:id="9114cd96-b09e-4ed8-ac3b-799090550152" config-ref="HTTP_CUSTOMERS" path="/{customerId}/addresses/phones/{phoneSiteId}" >
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"customerId" : vars.custAccountNumber,
+	"phoneSiteId" : vars.phoneContactAddrId
+}]]]></http:uri-params>
+		</http:request>
+		<logger level="INFO" doc:name="Logger" doc:id="8364060f-7eb1-41bb-910c-959ed2e5e12d" message="Received response from process-customers-api for customer #[vars.custAccountNumber] and phone number #[vars.phoneContactAddrId]" />
+		<ee:transform doc:name="Transform Message" doc:id="4789c382-7311-4f3b-af9f-70f924649cbe" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="062ecf35-4155-47f8-9933-712485675d69" type="HTTP:BASIC_AUTHENTICATION" >
+				<logger level="WARN" doc:name="Logger" doc:id="dbb81c51-25de-41b7-8b2a-afec16ebcae9" message="Invalid username or password attempted" />
+				<ee:transform doc:name="Transform Message" doc:id="42cc3d1d-901f-4e36-8197-2d0b3456e7bb" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	success: false,
+	message: "Invalid username or password"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<set-variable value="#[401]" doc:name="httpStatus = 401" doc:id="96c56088-7b88-449a-8214-4bd81ef36747" variableName="httpStatus" />
+			</on-error-continue>
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="e322cf7d-b29c-4fa9-87ef-0e06dcea8e91" >
+				<set-variable value="500" doc:name="httpStatus" doc:id="eb2aeed6-b371-409a-953f-0006ef987aeb" variableName="httpStatus" />
+				<logger level="ERROR" doc:name="Logger" doc:id="08bb0083-8ebd-474a-8e71-f9677c8fd848" message="Error occurred while updating address for a customer. Original request was #[write(vars.originalRequest,'application/json',{indent:false})]." />
+				<cloudhub:create-notification domain="#[p('appName')]" doc:name="Create Notification" doc:id="2f4825d8-4cdd-4a9f-b241-3ffb90cb1554" config-ref="CloudHub_Config" priority="ERROR" >
+					<cloudhub:message ><![CDATA[#["Error occurred while updating phone number of customer " ++ (vars.custAccountNumber default "")]]]></cloudhub:message>
+				</cloudhub:create-notification>
+			</on-error-continue>
+		</error-handler>
+    </flow>
+	<flow name="post:\customer\(custAccountNumber):application\json:web-storefront-api-config" doc:id="3251523b-dee7-428a-8a78-470052e520e6" >
+		<ee:transform doc:name="Transform Message" doc:id="bebeef26-cd4d-48cd-bd8b-e77f70cea7a5" >
+			<ee:variables >
+				<ee:set-variable variableName="custAccountNumber" ><![CDATA[attributes.uriParams.'custAccountNumber' ]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<http:basic-security-filter doc:name="Basic security filter" doc:id="c2e0f91f-9986-45ea-adb0-67de3cefa51b" realm="mule-realm" />
+		<spring:authorization-filter doc:name="Authorization filter" doc:id="c29cb3a5-5ca2-4e40-9c8d-b69621fb2b2b" requiredAuthorities="ROLE_USER" />
+		<set-variable value="#[output application/json --- payload]" doc:name="originalReq" doc:id="f0fe722b-e398-42bf-93ae-258a76370684" variableName="originalReq" />
+		<logger level="INFO" doc:name="Logger" doc:id="6e64d738-7269-4a26-adba-8d5dac03b807" message="Received request to update customer #[vars.custAccountNumber]. Sending payload to process-customers-api" />
+		<http:request method="PATCH" doc:name="PATCH:process-customers/customer-accounts/{customerId}" doc:id="f00cf294-7c3c-4205-bfe8-4652971678d5" config-ref="HTTP_CUSTOMERS" path="/{customerId}" >
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"customerId" : vars.custAccountNumber
+}]]]></http:uri-params>
+		</http:request>
+		<logger level="INFO" doc:name="Logger" doc:id="3f1b8b74-8e57-4f7c-83d9-362fb25034c6" message="Received response from process-customers-api for customer #[vars.custAccountNumber]" />
+		<ee:transform doc:name="Transform Message" doc:id="91aa8845-b1d1-4805-970f-d931250d32d2" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="105e49de-ffbc-4b35-995e-e73657dcb96a" type="HTTP:BASIC_AUTHENTICATION" >
+				<logger level="WARN" doc:name="Logger" doc:id="ff91b3df-5fea-4a26-8105-f82281855b1c" message="Invalid username or password attempted" />
+				<ee:transform doc:name="Transform Message" doc:id="786fcc01-7179-461f-aca6-45808163be08" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	success: false,
+	message: "Invalid username or password"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<set-variable value="#[401]" doc:name="httpStatus = 401" doc:id="097494f6-490c-454c-946c-7d7f307afd09" variableName="httpStatus" />
+			</on-error-continue>
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="b75fcc0a-d65d-443c-826e-26624cf0daf9" >
+				<set-variable value="500" doc:name="httpStatus" doc:id="13028d0e-e2ed-4610-a367-dadd89e18f3b" variableName="httpStatus" />
+				<logger level="ERROR" doc:name="Logger" doc:id="b83f98d9-e09f-4a4c-80f4-e89500098035" message="Error occurred while updating firstname/lastname for a customer. Original request was #[write(vars.originalRequest,'application/json',{indent:false})]." />
+				<cloudhub:create-notification domain="#[p('appName')]" doc:name="Create Notification" doc:id="2d059afb-edbe-4441-8302-4efa5e0d80d1" config-ref="CloudHub_Config" priority="ERROR" >
+					<cloudhub:message ><![CDATA[#["Error occurred while updating firstname/lastname of customer " ++ (vars.custAccountNumber default "")]]]></cloudhub:message>
+				</cloudhub:create-notification>
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<flow name="post:\shipments\rates\ground\fedEx\freight:application\json:web-storefront-api-config" doc:id="8d0f94aa-13cd-457a-954c-2fd15d0257e3" >
+		<http:basic-security-filter doc:name="Basic security filter" doc:id="c5d826f3-fe07-4f54-a667-887960fe57f3" realm="mule-realm" />
+		<spring:authorization-filter doc:name="Authorization filter" doc:id="682eda8e-6a79-4fdc-a015-acc154abf65c" requiredAuthorities="ROLE_USER" />
+		<logger level="INFO" doc:name="Logger" doc:id="909dee84-9b22-431c-9e11-ae995b654124" message="Payload received from Salesforce. Payload was #[write(payload default {},'application/json',{indent:false})]"/>
+		<set-variable value="#[output application/java&#10;---&#10;now() as Date ++ &quot;T&quot; ++ ((now()) as String {format: &quot;HH:00:00'Z'&quot;})]" doc:name="pickupDate" doc:id="7ffd589d-543a-4cf8-a5ff-830f24f51892" variableName="pickupDate" />
+		<ee:transform doc:name="Transform Message" doc:id="39ab7c66-e0c2-4312-8b4d-661b709e0958">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://fedex.com/ws/rate/v28
+---
+{
+	ns0#RateRequest: {
+		ns0#WebAuthenticationDetail: {
+			ns0#ParentCredential: {
+				ns0#Key: p('fedEx.key'),
+				ns0#Password: p('fedEx.password')
+			},
+			ns0#UserCredential: {
+				ns0#Key: p('fedEx.key'),
+				ns0#Password: p('fedEx.password')
+			}
+		},
+		ns0#ClientDetail: {
+			ns0#AccountNumber: p('fedEx.accountnumber'),
+			ns0#MeterNumber: p('fedEx.meternumber')
+		},
+		ns0#TransactionDetail: {
+			ns0#CustomerTransactionId: 'RateRequest_v28'
+		},
+		ns0#Version: {
+			ns0#ServiceId: 'crs',
+			ns0#Major: '28',
+			ns0#Intermediate: '0',
+			ns0#Minor: '0'
+		},
+		ns0#ReturnTransitAndCommit: '1',	
+		ns0#RequestedShipment: {
+			ns0#ShipTimestamp: vars.pickupDate,
+			ns0#DropoffType: 'REGULAR_PICKUP',
+			ns0#ServiceType: 'FEDEX_FREIGHT_PRIORITY',
+			ns0#PackagingType: 'YOUR_PACKAGING',
+			ns0#TotalWeight: {
+				ns0#Units: 'LB',
+				ns0#Value: payload.commodities.weight map $.value reduce ($$ + $) default "0"
+			},
+			ns0#PreferredCurrency: 'USD',
+			ns0#Shipper: {
+				ns0#AccountNumber: p('fedEx.accountnumber'),
+				ns0#Contact: {
+					ns0#CompanyName: 'DieselDash',
+				},
+				ns0#Address: {
+					ns0#StreetLines: '1202 Chalet Ln',//payload.shipFrom.address.addressLine,
+					ns0#StreetLines: 'Do Not Delete - Test Account',//payload.shipFrom.address.addressLine,
+					ns0#City: 'Harrison',//payload.shipFrom.address.city,
+					ns0#StateOrProvinceCode: 'AR',//payload.shipFrom.address.state,
+					ns0#PostalCode: '72601',//payload.shipFrom.address.postalCode,
+					ns0#CountryCode: 'US'//payload.shipFrom.address.countryCode
+				}
+			},
+			ns0#Recipient: {
+				ns0#AccountNumber: p('fedEx.accountnumber'),
+				ns0#Contact: {
+					ns0#PersonName: payload.shipTo.name default "",
+				},
+				ns0#Address: {
+					ns0#StreetLines: payload.shipTo.address.addressLine default "",
+					ns0#City: payload.shipTo.address.city default "",
+					ns0#StateOrProvinceCode: payload.shipTo.address.state default "",
+					ns0#PostalCode: payload.shipTo.address.postalCode default "",
+					ns0#CountryCode: payload.shipTo.address.countryCode default ""
+				}
+			},
+			ns0#ShippingChargesPayment: {
+				ns0#PaymentType: 'SENDER',
+				ns0#Payor: {
+					ns0#ResponsibleParty: {
+						ns0#AccountNumber: '510087020'
+					}
+				}
+			},
+			ns0#FreightShipmentDetail: {
+				ns0#FedExFreightAccountNumber: '510087020',
+				ns0#FedExFreightBillingContactAndAddress: {
+					ns0#Contact: {
+						ns0#PersonName: 'DD'
+					},
+					ns0#Address: {
+						ns0#StreetLines: '2000 Freight LTL Testing',
+						ns0#StreetLines: 'Do Not Delete - Test Account',
+						ns0#City: 'Harrison',
+						ns0#StateOrProvinceCode: 'AR',
+						ns0#PostalCode: '72601',
+						ns0#CountryCode: 'US'
+					}
+				},
+				ns0#Role: 'SHIPPER',
+				
+					(payload.commodities map (value, index) -> {
+						ns0#LineItems: {
+						ns0#Id: if(sizeOf(value.commodityId) > 10) value.commodityId[0 to 9] else value.commodityId,
+						ns0#FreightClass: 'CLASS_085',
+						ns0#Packaging: 'PIECE',
+						ns0#Pieces: value.numberOfPieces default 0,
+						ns0#Description: value.description default "",
+						ns0#Weight: {
+							ns0#Units: 'LB',
+							ns0#Value: value.weight.value default "0"
+						}
+						}
+				})
+			},
+			ns0#RateRequestTypes: 'LIST',
+			ns0#PackageCount: sizeOf(payload.commodities),
+			
+				(payload.commodities map (value, index) -> {
+					ns0#RequestedPackageLineItems: {
+					ns0#SequenceNumber: index +1,
+					ns0#GroupNumber: index +1,
+					ns0#GroupPackageCount: index +1,
+					ns0#Weight: {
+						ns0#Units: 'LB',
+						ns0#Value: value.weight.value default ""
+					},
+					ns0#Dimensions: {
+						ns0#Length: value.dimensions.length default "0",
+						ns0#Width: value.dimensions.width default "0",
+						ns0#Height: value.dimensions.height default "0",
+						ns0#Units: 'IN'
+					},
+					ns0#PhysicalPackaging: 'PIECE',
+					ns0#AssociatedFreightLineItems: {
+						ns0#Id: if(sizeOf(value.commodityId) > 10) value.commodityId[0 to 9] else value.commodityId
+					}
+					
+					}
+				})
+			}
+		}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="61aaa37d-0639-492c-bbc9-6dece3dd3bfc" message="calling fedEx /rest/FreightRate" />
+		<wsc:consume doc:name="FedEx webservice consume" doc:id="38e44a94-5633-43c5-9ab6-477434ef2ab7" config-ref="FedEx_Web_Service_Consumer_Config" operation="getRates"/>
+		<ee:transform doc:name="Transform Message" doc:id="1d730933-0d24-4da2-a525-f56e43257c9a">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+if (sizeOf(payload.body.RateReply.RateReplyDetails.*RatedShipmentDetails filter ($.ShipmentRateDetail.RateType == "PREFERRED_LIST_SHIPMENT") default [])> 0)(
+{
+	FreightRateResponse:{
+	Response: {
+		ResponseStatus: payload.body.RateReply.HighestSeverity,
+		Alert: payload.body.RateReply.Notifications.Message,
+		TransactionReference: payload.body.RateReply.TransactionDetail.CustomerTransactionId
+		},
+		Service: payload.body.RateReply.RateReplyDetails.CommitDetails.ServiceType,
+        TimeInTransit: payload.body.RateReply.RateReplyDetails.CommitDetails.TransitTime,
+		Rate: payload.body.RateReply.RateReplyDetails.*RatedShipmentDetails filter ($.ShipmentRateDetail.RateType == "PREFERRED_LIST_SHIPMENT" )		
+	}
+}
+) else (
+    payload
+)
+]]></ee:set-payload>
+			</ee:message>
+			<ee:variables />
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="5647df97-4603-4b2a-8bdd-f96624308e83" message="Received response from fedEx freight." />
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="9ccaedd7-b48f-4c3e-9915-8b4a82c13ff3" type="HTTP:BASIC_AUTHENTICATION" >
+				<logger level="WARN" doc:name="Logger" doc:id="7dfc90e6-8289-482b-9168-791fe46630ac" message="Invalid username or password attempted" />
+				<ee:transform doc:name="Transform Message" doc:id="e38a9d4c-cf27-4a44-8b3d-03bb889451b2" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	success: false,
+	message: "Invalid username or password"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<set-variable value="#[401]" doc:name="httpStatus = 401" doc:id="38c91f63-2d11-4da2-b637-748c1349c79b" variableName="httpStatus" />
+			</on-error-continue>
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="00d48b2b-92ae-45b0-9ce9-2297cfbee8ce" >
+				<logger level="ERROR" doc:name="Logger" doc:id="a2929133-2dde-4c23-a2db-47a9238b7435" message="Error occurred while getting ground fedex freight rates. Payload was #[write(payload default {},'application/json',{indent:false})] variables were #[write(vars default [], 'application/java')]" />
+				<ee:transform doc:name="Transform Message" doc:id="8b5cf60f-999f-42d3-9dab-8dcfc5df9587" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	success: false,
+	errorMessage: write(error default "Error",'application/json',{indent:false})
+}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="httpStatus" ><![CDATA[%dw 2.0
+output application/java
+---
+500]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<cloudhub:create-notification domain="#[p('appName')]" doc:name="Create Notification" doc:id="86515730-8e56-461a-9d71-aeb011296e07" config-ref="CloudHub_Config" priority="ERROR" >
+					<cloudhub:message ><![CDATA[#["Error occurred while getting ground FedEx freight rates."]]]></cloudhub:message>
+				</cloudhub:create-notification>
+			</on-error-continue>
+		</error-handler>
+	</flow>
+</mule>

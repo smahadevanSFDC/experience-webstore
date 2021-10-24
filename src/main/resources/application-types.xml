@@ -1,0 +1,255 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="calculatePricingInvReq" format="json">
+      <types:shape format="weave" example="examples/CalculatepricingInv.json"><![CDATA[%dw 2.0
+
+type calculatePricingInvReq = {|
+  customerId: String, 
+  productDetails: Array<{|    productId: String,     orgId: String,     uomCode: String,     quantity: String  |}>, 
+  inventoryLocation: String
+|} {"example": "{\"customerId\":\"432\",\"productDetails\":[{\"productId\":\"531974\",\"orgId\":\"23\",\"uomCode\":\"Ea\",\"quantity\":\"1\"}],\"inventoryLocation\":\"\"}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="ups-freight-rate-req" format="xml">
+      <types:shape format="xml-schema" element="{http://www.ups.com/XMLSchema/XOLTWS/FreightRate/v1.0}FreightRateRequest" location="schemas/FreightRateWebServiceSchema.xsd"/>
+    </types:type>
+    <types:type name="parcel" format="json">
+      <types:shape format="weave" example="examples/parcel-1.json"><![CDATA[%dw 2.0
+
+type parcel = {|
+  shipment: {|
+    shipper: {|
+      address: {|
+        line1: String, 
+        city: String, 
+        state: String, 
+        country: String, 
+        zip: String
+      |}, 
+      name: String, 
+      shipperNumber: String
+    |}, 
+    shipFrom: {|
+      address: {|
+        line1: String, 
+        city: String, 
+        state: String, 
+        country: String, 
+        zip: String
+      |}, 
+      name: String
+    |}, 
+    shipmentWeight: Number {"typeId": "int"}, 
+    service: String, 
+    packageWeight: Number {"typeId": "int"}, 
+    packageWeightUom: String, 
+    taxInfoIndicator: Boolean, 
+    shipmentWeightUom: String, 
+    shipTo: {|
+      address: {|
+        line1: String, 
+        line2: String, 
+        city: String, 
+        state: String, 
+        country: String, 
+        zip: String
+      |}, 
+      name: String
+    |}, 
+    packageServiceOptions: {|
+      declaredValue: {|
+        currencyCode: String, 
+        monetaryValue: String
+      |}
+    |}
+  |}
+|} {"example": "{\\\"shipment\\\":{\\\"shipper\\\":{\\\"address\\\":{\\\"line1\\\":\\\"1631 Chalk Rill Rd\\\",\\\"city\\\":\\\"Dallas\\\",\\\"state\\\":\\\"TX\\\",\\\"country\\\":\\\"US\\\",\\\"zip\\\":\\\"75212\\\"},\\\"name\\\":\\\"Stewart & Stevenson\\\",\\\"shipperNumber\\\":\\\"7425E9\\\"},\\\"shipFrom\\\":{\\\"address\\\":{\\\"line1\\\":\\\"1631 Chalk Rill Rd\\\",\\\"city\\\":\\\"Dallas\\\",\\\"state\\\":\\\"TX\\\",\\\"country\\\":\\\"US\\\",\\\"zip\\\":\\\"75212\\\"},\\\"name\\\":\\\"Stewart & Stevenson\\\"},\\\"shipmentWeight\\\":20,\\\"service\\\":\\\"Next Day Air\\\",\\\"packageWeight\\\":22,\\\"packageWeightUom\\\":\\\"LBS\\\",\\\"taxInfoIndicator\\\":true,\\\"shipmentWeightUom\\\":\\\"LBS\\\",\\\"shipTo\\\":{\\\"address\\\":{\\\"line1\\\":\\\"5700 Lombardo center\\\",\\\"line2\\\":\\\"ste. 201\\\",\\\"city\\\":\\\"Seven Hills\\\",\\\"state\\\":\\\"OH\\\",\\\"country\\\":\\\"US\\\",\\\"zip\\\":\\\"44031\\\"},\\\"name\\\":\\\"Acme\\\"},\\\"packageServiceOptions\\\":{\\\"declaredValue\\\":{\\\"currencyCode\\\":\\\"USD\\\",\\\"monetaryValue\\\":\\\"2000\\\"}}}}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="freight" format="json">
+      <types:shape format="weave" example="examples/freight.json"><![CDATA[%dw 2.0
+
+type freight = {|
+  shipFrom: {|
+    name: String, 
+    address: {|
+      addressLine: String, 
+      city: String, 
+      state: String, 
+      postalCode: String, 
+      countryCode: String, 
+      residentialAddress: Boolean
+    |}, 
+    attentionName: String, 
+    tarrifPoint: String
+  |}, 
+  shipTo: {|
+    name: String, 
+    address: {|
+      addressLine: String, 
+      city: String, 
+      state: String, 
+      postalCode: String, 
+      countryCode: String, 
+      residentialAddress: Boolean
+    |}, 
+    attentionName: String, 
+    tarrifPoint: String
+  |}, 
+  paymentInformation: {|
+    payer: {|
+      name: String, 
+      address: {|
+        addressLine: String, 
+        city: String, 
+        state: String, 
+        postalCode: String, 
+        countryCode: String, 
+        residentialAddress: Boolean
+      |}, 
+      attentionName: String, 
+      shipperNumber: String
+    |}, 
+    shipmentBillingOption: {|
+      code: String, 
+      description: String
+    |}
+  |}, 
+  service: {|
+    code: String, 
+    description: String
+  |}, 
+  handlingUnitOne: {|
+    quantity: String, 
+    unitType: {|
+      code: String, 
+      description: String
+    |}
+  |}, 
+  commodities: Array<{|    commidityId: String,     description: String,     weight: {|      value: String,       unitOfMeasurement: {|        code: String,         description: String      |}    |},     dimensions: {|      length: String,       width: String,       height: String,       unitOfMeasurement: {|        code: String,         description: String      |}    |},     numberOfPieces: String,     packagingType: {|      code: String,       description: String    |},     dangerousGoods: Boolean,     commodityValue: {|      currencyCode: String,       monetoryValue: String    |},     freightClass: String  |}>, 
+  pickupRequest: {|
+    pickupDate: String, 
+    additionalComments: String
+  |}, 
+  shipmentServiceOptions: {|
+    declaredValue: {|
+      currencyCode: String, 
+      monetaryValue: String
+    |}
+  |}, 
+  timeInTransit: Boolean
+|} {"example": "{\\\"shipFrom\\\":{\\\"name\\\":\\\"SNS Freight\\\",\\\"address\\\":{\\\"addressLine\\\":\\\"1631 CHALK RILL RD\\\",\\\"city\\\":\\\"DALLAS\\\",\\\"state\\\":\\\"TX\\\",\\\"postalCode\\\":\\\"75212\\\",\\\"countryCode\\\":\\\"US\\\",\\\"residentialAddress\\\":false},\\\"attentionName\\\":\\\"\\\",\\\"tarrifPoint\\\":\\\"\\\"},\\\"shipTo\\\":{\\\"name\\\":\\\"\\\",\\\"address\\\":{\\\"addressLine\\\":\\\"5700 Lombardo Ctr. Ste. 201\\\",\\\"city\\\":\\\"Seven Hills\\\",\\\"state\\\":\\\"OH\\\",\\\"postalCode\\\":\\\"44130\\\",\\\"countryCode\\\":\\\"US\\\",\\\"residentialAddress\\\":false},\\\"attentionName\\\":\\\"Mr. Omkar\\\",\\\"tarrifPoint\\\":\\\"\\\"},\\\"paymentInformation\\\":{\\\"payer\\\":{\\\"name\\\":\\\"SNS\\\",\\\"address\\\":{\\\"addressLine\\\":\\\"55 Waugh Dr # 1000\\\",\\\"city\\\":\\\"Houston\\\",\\\"state\\\":\\\"TX\\\",\\\"postalCode\\\":\\\"77007\\\",\\\"countryCode\\\":\\\"US\\\",\\\"residentialAddress\\\":false},\\\"attentionName\\\":\\\"\\\",\\\"shipperNumber\\\":\\\"Account Id\\\"},\\\"shipmentBillingOption\\\":{\\\"code\\\":\\\"10\\\",\\\"description\\\":\\\"PREPAID\\\"}},\\\"service\\\":{\\\"code\\\":\\\"308\\\",\\\"description\\\":\\\"UPS Freight LTL\\\"},\\\"handlingUnitOne\\\":{\\\"quantity\\\":\\\"50\\\",\\\"unitType\\\":{\\\"code\\\":\\\"LOO\\\",\\\"description\\\":\\\"Loose\\\"}},\\\"commodities\\\":[{\\\"commidityId\\\":\\\"\\\",\\\"description\\\":\\\"Drum of oil\\\",\\\"weight\\\":{\\\"value\\\":\\\"500\\\",\\\"unitOfMeasurement\\\":{\\\"code\\\":\\\"lbs\\\",\\\"description\\\":\\\"pounds\\\"}},\\\"dimensions\\\":{\\\"length\\\":\\\"35\\\",\\\"width\\\":\\\"24\\\",\\\"height\\\":\\\"40\\\",\\\"unitOfMeasurement\\\":{\\\"code\\\":\\\"in\\\",\\\"description\\\":\\\"inches\\\"}},\\\"numberOfPieces\\\":\\\"50\\\",\\\"packagingType\\\":{\\\"code\\\":\\\"PLT\\\",\\\"description\\\":\\\"Pallet\\\"},\\\"dangerousGoods\\\":false,\\\"commodityValue\\\":{\\\"currencyCode\\\":\\\"USD\\\",\\\"monetoryValue\\\":\\\"200.33\\\"},\\\"freightClass\\\":\\\"85\\\"}],\\\"pickupRequest\\\":{\\\"pickupDate\\\":\\\"20191121\\\",\\\"additionalComments\\\":\\\"Pickup date is in EST\\\"},\\\"shipmentServiceOptions\\\":{\\\"declaredValue\\\":{\\\"currencyCode\\\":\\\"USD\\\",\\\"monetaryValue\\\":\\\"2000\\\"}},\\\"timeInTransit\\\":true}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="fedExFreight" format="xml">
+      <types:example format="xml" element="{http://fedex.com/ws/rate/v28}RateRequest" location="examples/fedexFreight.xml"/>
+    </types:type>
+    <types:type name="fedex-freight-rate-req" format="xml">
+      <types:example format="xml" element="{http://fedex.com/ws/rate/v28}RateRequest" location="wsdl/FedExFrieghtPriority.xml"/>
+    </types:type>
+    <types:type name="fedex-freight-response" format="xml">
+      <types:example format="xml" element="{http://fedex.com/ws/rate/v28}RateReply" location="examples/fedexFreightResponse.xml"/>
+    </types:type>
+    <types:type name="sf-freight-response" format="json">
+      <types:shape format="weave" example="examples/sf-freight-response.json"><![CDATA[%dw 2.0
+
+type sf_freight_response = {|
+  FreightRateResponse: {|
+    Response: {|
+      ResponseStatus: {|
+        Code: String, 
+        Description: String
+      |}, 
+      Alert: Array<{|        Code: String,         Description: String      |}>
+    |}, 
+    Rate: Array<{|      Type: {|        Code: String,         Description: String      |},       Factor: {|        Value: String,         UnitOfMeasurement: {| Code: String |}      |}    |}>, 
+    Commodity: {|
+      Description: String, 
+      Weight: {|
+        Value: String, 
+        UnitOfMeasurement: {| Code: String |}
+      |}, 
+      AdjustedWeight: {|
+        Value: String, 
+        UnitOfMeasurement: {| Code: String |}
+      |}
+    |}, 
+    TotalShipmentCharge: {|
+      CurrencyCode: String, 
+      MonetaryValue: String
+    |}, 
+    BillableShipmentWeight: {|
+      Value: String, 
+      UnitOfMeasurement: {| Code: String |}
+    |}, 
+    DimensionalWeight: {|
+      Value: String, 
+      UnitOfMeasurement: {| Code: String |}
+    |}, 
+    Service: {| Code: String |}, 
+    AlternateRatesResponse: {|
+      AlternateRateType: {|
+        Code: String, 
+        Description: String
+      |}, 
+      Rate: Array<{|        Type: {|          Code: String,           Description: String        |},         Factor: {|          Value: String,           UnitOfMeasurement: {| Code: String |}        |}      |}>, 
+      BillableShipmentWeight: {|
+        Value: String, 
+        UnitOfMeasurement: {| Code: String |}
+      |}
+    |}, 
+    RatingSchedule: {|
+      Code: String, 
+      Description: String
+    |}, 
+    TimeInTransit: {| DaysInTransit: String |}
+  |}
+|} {"example": "{\\\"FreightRateResponse\\\":{\\\"Response\\\":{\\\"ResponseStatus\\\":{\\\"Code\\\":\\\"1\\\",\\\"Description\\\":\\\"Success\\\"},\\\"Alert\\\":[{\\\"Code\\\":\\\"9369054\\\",\\\"Description\\\":\\\"User is not registered with UPS Ground Freight.\\\"},{\\\"Code\\\":\\\"9369055\\\",\\\"Description\\\":\\\"User is not eligible for contract rates.\\\"},{\\\"Code\\\":\\\"9369080\\\",\\\"Description\\\":\\\"Time in Transit (for FRS\\/GFP) information  not available at this time.\\\"}]},\\\"Rate\\\":[{\\\"Type\\\":{\\\"Code\\\":\\\"DSCNT\\\",\\\"Description\\\":\\\"DSCNT\\\"},\\\"Factor\\\":{\\\"Value\\\":\\\"917.95\\\",\\\"UnitOfMeasurement\\\":{\\\"Code\\\":\\\"USD\\\"}}},{\\\"Type\\\":{\\\"Code\\\":\\\"DSCNT_RATE\\\",\\\"Description\\\":\\\"DSCNT_RATE\\\"},\\\"Factor\\\":{\\\"Value\\\":\\\"70.00\\\",\\\"UnitOfMeasurement\\\":{\\\"Code\\\":\\\"%\\\"}}},{\\\"Type\\\":{\\\"Code\\\":\\\"HAZMAT\\\",\\\"Description\\\":\\\"HAZMAT\\\"},\\\"Factor\\\":{\\\"Value\\\":\\\"30.00\\\",\\\"UnitOfMeasurement\\\":{\\\"Code\\\":\\\"USD\\\"}}},{\\\"Type\\\":{\\\"Code\\\":\\\"2\\\",\\\"Description\\\":\\\"2\\\"},\\\"Factor\\\":{\\\"Value\\\":\\\"94.42\\\",\\\"UnitOfMeasurement\\\":{\\\"Code\\\":\\\"USD\\\"}}},{\\\"Type\\\":{\\\"Code\\\":\\\"LND_GROSS\\\",\\\"Description\\\":\\\"LND_GROSS\\\"},\\\"Factor\\\":{\\\"Value\\\":\\\"1311.35\\\",\\\"UnitOfMeasurement\\\":{\\\"Code\\\":\\\"USD\\\"}}},{\\\"Type\\\":{\\\"Code\\\":\\\"AFTR_DSCNT\\\",\\\"Description\\\":\\\"AFTR_DSCNT\\\"},\\\"Factor\\\":{\\\"Value\\\":\\\"393.40\\\",\\\"UnitOfMeasurement\\\":{\\\"Code\\\":\\\"USD\\\"}}}],\\\"Commodity\\\":{\\\"Description\\\":\\\"Drum of oil\\\",\\\"Weight\\\":{\\\"Value\\\":\\\"500\\\",\\\"UnitOfMeasurement\\\":{\\\"Code\\\":\\\"lbs\\\"}},\\\"AdjustedWeight\\\":{\\\"Value\\\":\\\"500\\\",\\\"UnitOfMeasurement\\\":{\\\"Code\\\":\\\"lbs\\\"}}},\\\"TotalShipmentCharge\\\":{\\\"CurrencyCode\\\":\\\"USD\\\",\\\"MonetaryValue\\\":\\\"517.82\\\"},\\\"BillableShipmentWeight\\\":{\\\"Value\\\":\\\"500\\\",\\\"UnitOfMeasurement\\\":{\\\"Code\\\":\\\"LBS\\\"}},\\\"DimensionalWeight\\\":{\\\"Value\\\":\\\"0\\\",\\\"UnitOfMeasurement\\\":{\\\"Code\\\":\\\"LBS\\\"}},\\\"Service\\\":{\\\"Code\\\":\\\"308\\\"},\\\"AlternateRatesResponse\\\":{\\\"AlternateRateType\\\":{\\\"Code\\\":\\\"1\\\",\\\"Description\\\":\\\"FRS Rate\\\"},\\\"Rate\\\":[{\\\"Type\\\":{\\\"Code\\\":\\\"DSCNT\\\",\\\"Description\\\":\\\"DSCNT\\\"},\\\"Factor\\\":{\\\"Value\\\":\\\"1049.08\\\",\\\"UnitOfMeasurement\\\":{\\\"Code\\\":\\\"USD\\\"}}},{\\\"Type\\\":{\\\"Code\\\":\\\"DSCNT_RATE\\\",\\\"Description\\\":\\\"DSCNT_RATE\\\"},\\\"Factor\\\":{\\\"Value\\\":\\\"80.00\\\",\\\"UnitOfMeasurement\\\":{\\\"Code\\\":\\\"%\\\"}}},{\\\"Type\\\":{\\\"Code\\\":\\\"LND_GROSS\\\",\\\"Description\\\":\\\"LND_GROSS\\\"},\\\"Factor\\\":{\\\"Value\\\":\\\"1311.35\\\",\\\"UnitOfMeasurement\\\":{\\\"Code\\\":\\\"USD\\\"}}},{\\\"Type\\\":{\\\"Code\\\":\\\"AFTR_DSCNT\\\",\\\"Description\\\":\\\"AFTR_DSCNT\\\"},\\\"Factor\\\":{\\\"Value\\\":\\\"262.27\\\",\\\"UnitOfMeasurement\\\":{\\\"Code\\\":\\\"USD\\\"}}}],\\\"BillableShipmentWeight\\\":{\\\"Value\\\":\\\"500\\\",\\\"UnitOfMeasurement\\\":{\\\"Code\\\":\\\"LBS\\\"}}},\\\"RatingSchedule\\\":{\\\"Code\\\":\\\"02\\\",\\\"Description\\\":\\\"Published Rates\\\"},\\\"TimeInTransit\\\":{\\\"DaysInTransit\\\":\\\"2\\\"}}}"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#694667cd-7c31-462c-957f-e0c060fb0f67">
+    <types:operation-declaration>
+      <types:inputs>
+        <types:parameter name="body" type="calculatePricingInvReq"/>
+      </types:inputs>
+    </types:operation-declaration>
+  </types:enrichment>
+  <types:enrichment select="#8828b1eb-fe64-473d-806e-55f78f143c46">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="freight"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#ee07a58b-5014-442e-9d60-69c828d1280e">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="parcel"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#39ab7c66-e0c2-4312-8b4d-661b709e0958">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="freight"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="fedex-freight-rate-req"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>
