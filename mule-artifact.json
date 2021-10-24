@@ -1,0 +1,44 @@
+{
+	"redeploymentEnabled": true,
+	"name": "spring-security",
+	"classLoaderModelLoaderDescriptor": {
+		"attributes": {
+			"exportedResources": [
+				"beans-dev.xml",
+				"beans-uat.xml",
+				"beans-prod.xml",
+				"api/web-storefront-api.raml",
+				"api/dataTypes.raml",
+				"wsdl/XAV.wsdl",
+				"wsdl/common.xsd",
+				"wsdl/Error1.1.xsd",
+				"wsdl/XAVWebServiceSchema.xsd",
+				"wsdl/RateWebServiceSchema.xsd",
+				"wsdl/RateWS.wsdl",
+				"wsdl/RateService_v28.wsdl"
+			]
+		},
+		"id": "mule"
+	},
+	"requiredProduct": "MULE_EE",
+	"minMuleVersion": "4.1.5",
+	"bundleDescriptorLoader": {
+		"attributes": {
+			
+		},
+		"id": "mule"
+	},
+	"secureProperties": [
+		"ch.username",
+		"ch.password",
+		"ups.username",
+		"ups.password",
+		"ups.licenseNumber",
+		"ss.authId",
+		"ss.authToken",
+		"fedEx.key",
+		"fedEx.password",
+		"fedEx.accountnumber",
+		"fedEx.meternumber"
+	]
+}
